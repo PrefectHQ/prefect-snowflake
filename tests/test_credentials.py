@@ -23,11 +23,24 @@ def snowflake_auth(monkeypatch):
     monkeypatch.setattr("snowflake.connector.connection.Auth", auth_mock)
 
 
-def test_snowflake_credential(connection_params):
+def test_snowflake_credentials_post_init(connection_params):
     snowflake_credentials = SnowflakeCredentials(**connection_params)
     for param in connection_params:
         expected = connection_params[param]
         assert getattr(snowflake_credentials, param) == expected
+
+    valid_params = dir(SnowflakeCredentials)
+    for param in valid_params:
+        expected = getattr(snowflake_credentials, param)
+        if param.startswith("_") or callable(expected):
+            continue
+
+        if expected is None:
+            # it is filtered out
+            assert param not in snowflake_credentials.connect_params
+        else:
+            # the value is correct
+            assert snowflake_credentials.connect_params[param] == expected
 
 
 def test_snowflake_credentials_get_connection_override(
@@ -52,7 +65,7 @@ def test_snowflake_credentials_get_connection_missing_auth(
     connection_params_missing = connection_params.copy()
     connection_params_missing.pop("password")
     with pytest.raises(ValueError, match="One of the authentication methods"):
-        SnowflakeCredentials(**connection_params).get_connection()
+        SnowflakeCredentials(**connection_params_missing).get_connection()
 
 
 @pytest.mark.parametrize("param", ("database", "warehouse"))
