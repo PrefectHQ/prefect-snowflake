@@ -9,7 +9,7 @@ from prefect_snowflake.credentials import SnowflakeCredentials
 
 
 @task
-def snowflake_query(
+async def snowflake_query(
     query: str,
     snowflake_credentials: "SnowflakeCredentials",
     params: Union[Tuple[Any], Dict[str, Any]] = None,
@@ -64,6 +64,8 @@ def snowflake_query(
     # context manager automatically rolls back failed transactions and closes
     with snowflake_credentials.get_connection(**connect_params) as connection:
         with connection.cursor(cursor_type) as cursor:
-            response = cursor.execute(query, params=params)
-            result = response.fetchall()
+            response = cursor.execute_async(query, params=params)
+            query_id = response["queryId"]
+            cursor.get_results_from_sfqid(query_id)
+            result = cursor.fetchall()
     return result

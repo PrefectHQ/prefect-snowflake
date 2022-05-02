@@ -13,10 +13,16 @@ class SnowflakeCursor:
     def __exit__(self, *exc):
         return False
 
-    def execute(self, query, params):
-        resp = MagicMock()
-        resp.fetchall.return_value = {"query": query, "params": params}
-        return resp
+    def execute_async(self, query, params):
+        query_id = "1234"
+        self.result = {query_id: {"query": query, "params": params}}
+        return {"queryId": query_id}
+
+    def get_results_from_sfqid(self, query_id):
+        self.query_result = self.result[query_id]
+
+    def fetchall(self):
+        return self.query_result
 
 
 class SnowflakeConnection:
