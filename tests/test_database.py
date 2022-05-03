@@ -15,7 +15,7 @@ class SnowflakeCursor:
 
     def execute_async(self, query, params):
         query_id = "1234"
-        self.result = {query_id: {"query": query, "params": params}}
+        self.result = {query_id: [(query, params)]}
         return {"queryId": query_id}
 
     def get_results_from_sfqid(self, query_id):
@@ -54,5 +54,5 @@ def test_snowflake_query(snowflake_credentials):
         return result
 
     result = test_flow().result().result()
-    assert result["query"] == "query"
-    assert result["params"] == ("param",)
+    assert result[0][0] == "query"
+    assert result[0][1] == ("param",)
