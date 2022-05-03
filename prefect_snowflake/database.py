@@ -1,5 +1,6 @@
 """Module for querying against Snowflake database."""
 
+import asyncio
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from prefect import task
@@ -66,6 +67,10 @@ async def snowflake_query(
         with connection.cursor(cursor_type) as cursor:
             response = cursor.execute_async(query, params=params)
             query_id = response["queryId"]
+            while connection.is_still_running(
+                connection.get_query_status_throw_if_error(query_id)
+            ):
+                await asyncio.sleep(0.05)
             cursor.get_results_from_sfqid(query_id)
             result = cursor.fetchall()
     return result

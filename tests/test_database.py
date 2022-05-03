@@ -35,6 +35,12 @@ class SnowflakeConnection:
     def cursor(self, cursor_type):
         return SnowflakeCursor()
 
+    def is_still_running(self, state):
+        return state
+
+    def get_query_status_throw_if_error(self, query_id):
+        return False
+
 
 @pytest.fixture()
 def snowflake_credentials():
