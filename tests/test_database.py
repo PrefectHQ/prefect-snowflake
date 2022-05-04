@@ -15,7 +15,7 @@ class SnowflakeCursor:
 
     def execute(self, query, params):
         resp = MagicMock()
-        resp.fetchall.return_value = {"query": query, "params": params}
+        resp.fetchall.return_value = [(query, params),]
         return resp
 
 
@@ -48,5 +48,5 @@ def test_snowflake_query(snowflake_credentials):
         return result
 
     result = test_flow().result().result()
-    assert result["query"] == "query"
-    assert result["params"] == ("param",)
+    assert result[0][0] == "query"
+    assert result[0][1] == ("param",)
