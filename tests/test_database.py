@@ -15,7 +15,9 @@ class SnowflakeCursor:
 
     def execute(self, query, params):
         resp = MagicMock()
-        resp.fetchall.return_value = [(query, params),]
+        resp.fetchall.return_value = [
+            (query, params),
+        ]
         return resp
 
 
