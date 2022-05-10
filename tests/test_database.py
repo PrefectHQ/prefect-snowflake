@@ -13,12 +13,16 @@ class SnowflakeCursor:
     def __exit__(self, *exc):
         return False
 
-    def execute(self, query, params):
-        resp = MagicMock()
-        resp.fetchall.return_value = [
-            (query, params),
-        ]
-        return resp
+    def execute_async(self, query, params):
+        query_id = "1234"
+        self.result = {query_id: [(query, params)]}
+        return {"queryId": query_id}
+
+    def get_results_from_sfqid(self, query_id):
+        self.query_result = self.result[query_id]
+
+    def fetchall(self):
+        return self.query_result
 
 
 class SnowflakeConnection:
@@ -30,6 +34,12 @@ class SnowflakeConnection:
 
     def cursor(self, cursor_type):
         return SnowflakeCursor()
+
+    def is_still_running(self, state):
+        return state
+
+    def get_query_status_throw_if_error(self, query_id):
+        return False
 
 
 @pytest.fixture()
