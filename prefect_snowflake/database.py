@@ -1,5 +1,6 @@
 """Module for querying against Snowflake database."""
 
+import asyncio
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from prefect import task
@@ -9,7 +10,7 @@ from prefect_snowflake.credentials import SnowflakeCredentials
 
 
 @task
-def snowflake_query(
+async def snowflake_query(
     query: str,
     snowflake_credentials: "SnowflakeCredentials",
     params: Union[Tuple[Any], Dict[str, Any]] = None,
@@ -64,6 +65,12 @@ def snowflake_query(
     # context manager automatically rolls back failed transactions and closes
     with snowflake_credentials.get_connection(**connect_params) as connection:
         with connection.cursor(cursor_type) as cursor:
-            response = cursor.execute(query, params=params)
-            result = response.fetchall()
+            response = cursor.execute_async(query, params=params)
+            query_id = response["queryId"]
+            while connection.is_still_running(
+                connection.get_query_status_throw_if_error(query_id)
+            ):
+                await asyncio.sleep(0.05)
+            cursor.get_results_from_sfqid(query_id)
+            result = cursor.fetchall()
     return result
