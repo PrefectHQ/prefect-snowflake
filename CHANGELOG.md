@@ -25,4 +25,4 @@ Released on May 13th, 2022.
 
 ### Added
 
-- `snowflake_query` task - [#1](https://github.com/PrefectHQ/prefect-snowflake/pull/1)
+- `snowflake_query` task - [#5](https://github.com/PrefectHQ/prefect-snowflake/pull/5)
