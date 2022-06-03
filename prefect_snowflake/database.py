@@ -131,7 +131,7 @@ async def snowflake_multiquery(
                 ["SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;", "SELECT 1,2"],
                 snowflake_credentials,
                 params={"id_param": 1},
-                as_transaction = True
+                as_transaction=True
             )
             return result
 
