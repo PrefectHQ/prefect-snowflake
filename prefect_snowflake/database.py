@@ -95,7 +95,7 @@ async def snowflake_multiquery(
     Allows execution in a transaction.
 
     Args:
-        queries: The List of queries to execute against the database.
+        queries: The list of queries to execute against the database.
         params: The params to replace the placeholders in the query.
         snowflake_credentials: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
