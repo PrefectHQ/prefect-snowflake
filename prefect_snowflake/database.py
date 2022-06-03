@@ -158,8 +158,7 @@ async def snowflake_multiquery(
                 results.append(result)
 
     # cut off results from BEGIN/COMMIT queries
-    return (
-        results[1:-1]
-        if as_transaction and not return_transaction_control_results
-        else results
-    )
+    if as_transaction and not return_transaction_control_results:
+        return results[1:-1]
+    else:
+        return results
