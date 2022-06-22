@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- Support for running multiple queries in a one session and in a transaction - [#9](https://github.com/PrefectHQ/prefect-snowflake/pull/9)
 
 ### Changed
 
@@ -21,8 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.1.0
 
-Released on ????? ?th, 20??.
+Released on May 13th, 2022.
 
 ### Added
 
-- `task_name` task - [#1](https://github.com/PrefectHQ/prefect-snowflake/pull/1)
+- `snowflake_query` task - [#5](https://github.com/PrefectHQ/prefect-snowflake/pull/5)

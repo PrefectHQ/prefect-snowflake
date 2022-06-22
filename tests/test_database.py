@@ -3,7 +3,12 @@ from unittest.mock import MagicMock
 import pytest
 from prefect import flow
 
-from prefect_snowflake.database import snowflake_query
+from prefect_snowflake.database import (
+    BEGIN_TRANSACTION_STATEMENT,
+    END_TRANSACTION_STATEMENT,
+    snowflake_multiquery,
+    snowflake_query,
+)
 
 
 class SnowflakeCursor:
@@ -62,3 +67,61 @@ def test_snowflake_query(snowflake_credentials):
     result = test_flow().result().result()
     assert result[0][0] == "query"
     assert result[0][1] == ("param",)
+
+
+def test_snowflake_multiquery(snowflake_credentials):
+    @flow
+    def test_flow():
+        result = snowflake_multiquery(
+            ["query1", "query2"],
+            snowflake_credentials,
+            params=("param",),
+        )
+        return result
+
+    result = test_flow().result().result()
+    assert result[0][0][0] == "query1"
+    assert result[0][0][1] == ("param",)
+    assert result[1][0][0] == "query2"
+    assert result[1][0][1] == ("param",)
+
+
+def test_snowflake_multiquery_transaction(snowflake_credentials):
+    @flow
+    def test_flow():
+        result = snowflake_multiquery(
+            ["query1", "query2"],
+            snowflake_credentials,
+            params=("param",),
+            as_transaction=True,
+        )
+        return result
+
+    result = test_flow().result().result()
+    assert result[0][0][0] == "query1"
+    assert result[0][0][1] == ("param",)
+    assert result[1][0][0] == "query2"
+    assert result[1][0][1] == ("param",)
+
+
+def test_snowflake_multiquery_transaction_with_transaction_control_results(
+    snowflake_credentials,
+):
+    @flow
+    def test_flow():
+        result = snowflake_multiquery(
+            ["query1", "query2"],
+            snowflake_credentials,
+            params=("param",),
+            as_transaction=True,
+            return_transaction_control_results=True,
+        )
+        return result
+
+    result = test_flow().result().result()
+    assert result[0][0][0] == BEGIN_TRANSACTION_STATEMENT
+    assert result[1][0][0] == "query1"
+    assert result[1][0][1] == ("param",)
+    assert result[2][0][0] == "query2"
+    assert result[2][0][1] == ("param",)
+    assert result[3][0][0] == END_TRANSACTION_STATEMENT
