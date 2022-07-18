@@ -1,13 +1,13 @@
 """Credentials class to authenticate Snowflake."""
 
-from dataclasses import dataclass
 from typing import Optional
 
+from prefect.blocks.core import Block
+from pydantic import SecretBytes, SecretStr
 from snowflake import connector
 
 
-@dataclass
-class SnowflakeCredentials:
+class SnowflakeCredentials(Block):
     """
     Dataclass used to manage authentication with Snowflake.
 
@@ -32,12 +32,12 @@ class SnowflakeCredentials:
 
     account: str
     user: str
-    password: Optional[str] = None
+    password: Optional[SecretStr] = None
     database: Optional[str] = None
     warehouse: Optional[str] = None
-    private_key: Optional[bytes] = None
+    private_key: Optional[SecretBytes] = None
     authenticator: Optional[str] = None
-    token: Optional[str] = None
+    token: Optional[SecretStr] = None
     schema: Optional[str] = None
     role: Optional[str] = None
     autocommit: Optional[bool] = None
