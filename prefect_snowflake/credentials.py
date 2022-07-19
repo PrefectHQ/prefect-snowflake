@@ -42,7 +42,7 @@ class SnowflakeCredentials(Block):
     role: Optional[str] = None
     autocommit: Optional[bool] = None
 
-    def __post_init__(self):
+    def block_initialization(self):
         """
         Filter out unset values.
         """
