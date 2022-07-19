@@ -8,10 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- Support for running multiple queries in a one session and in a transaction - [#9](https://github.com/PrefectHQ/prefect-snowflake/pull/9)
 
 ### Changed
-- Converted `SnowflakeCredentials` into a `Block` - [#13](https://github.com/PrefectHQ/prefect-snowflake/pull/13).
 
 ### Deprecated
 
@@ -20,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.1.1
+
+Released on July 19th, 2022.
+
+### Added
+- Support for running multiple queries in a one session and in a transaction - [#9](https://github.com/PrefectHQ/prefect-snowflake/pull/9)
+
+### Changed
+- Converted `SnowflakeCredentials` into a `Block` - [#13](https://github.com/PrefectHQ/prefect-snowflake/pull/13).
+- Updated tests to be compatible with core Prefect library (v2.0b9) and bumped required version - [#14](https://github.com/PrefectHQ/prefect-snowflake/pull/14).
 
 ## 0.1.0
 
