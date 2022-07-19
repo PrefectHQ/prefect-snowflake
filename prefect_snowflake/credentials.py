@@ -3,7 +3,7 @@
 from typing import Optional
 
 from prefect.blocks.core import Block
-from pydantic import SecretBytes, SecretStr
+from pydantic import Field, SecretBytes, SecretStr
 from snowflake import connector
 
 
@@ -38,7 +38,7 @@ class SnowflakeCredentials(Block):
     private_key: Optional[SecretBytes] = None
     authenticator: Optional[str] = None
     token: Optional[SecretStr] = None
-    schema: Optional[str] = None
+    schema_: Optional[str] = Field(alias="schema")
     role: Optional[str] = None
     autocommit: Optional[bool] = None
 
@@ -55,7 +55,7 @@ class SnowflakeCredentials(Block):
             "private_key": self.private_key,
             "authenticator": self.authenticator,
             "token": self.token,
-            "schema": self.schema,
+            "schema": self.schema_,
             "role": self.role,
             "autocommit": self.autocommit,
             # required to track task's usage in the Snowflake Partner Network Portal
