@@ -1,2 +1,2 @@
-prefect>=2.0a13
+prefect>=2.0b9
 snowflake-connector-python>=2.7.6

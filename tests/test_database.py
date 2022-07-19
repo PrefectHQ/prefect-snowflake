@@ -64,7 +64,7 @@ def test_snowflake_query(snowflake_credentials):
         )
         return result
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result[0][0] == "query"
     assert result[0][1] == ("param",)
 
@@ -79,7 +79,7 @@ def test_snowflake_multiquery(snowflake_credentials):
         )
         return result
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result[0][0][0] == "query1"
     assert result[0][0][1] == ("param",)
     assert result[1][0][0] == "query2"
@@ -97,7 +97,7 @@ def test_snowflake_multiquery_transaction(snowflake_credentials):
         )
         return result
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result[0][0][0] == "query1"
     assert result[0][0][1] == ("param",)
     assert result[1][0][0] == "query2"
@@ -118,7 +118,7 @@ def test_snowflake_multiquery_transaction_with_transaction_control_results(
         )
         return result
 
-    result = test_flow().result().result()
+    result = test_flow()
     assert result[0][0][0] == BEGIN_TRANSACTION_STATEMENT
     assert result[1][0][0] == "query1"
     assert result[1][0][1] == ("param",)
