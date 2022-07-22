@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Released on July 22nd, 2022.
 
 ### Added
-- Added setup.py entry point - [#32](https://github.com/PrefectHQ/prefect-snowflake/pull/15)
+- Added setup.py entry point - [#18](https://github.com/PrefectHQ/prefect-snowflake/pull/18)
 
 ## 0.1.1
 
