@@ -28,7 +28,14 @@ class SnowflakeCredentials(Block):
         schema: The name of the default schema to use.
         role: The name of the default role to use.
         autocommit: Whether to automatically commit.
-    """  # noqa
+
+    Example:
+        Load stored Snowflake credentials:
+        ```python
+        from prefect_snowflake import SnowflakeCredentials
+        snowflake_credentials_block = SnowflakeCredentials.load("MY_BLOCK_NAME")
+        ```
+    """  # noqa E501
 
     _block_type_name = "Snowflake Credentials"
     _logo_url = "https://github.com/PrefectHQ/orion/blob/main/docs/img/collections/snowflake.png?raw=true"  # noqa
