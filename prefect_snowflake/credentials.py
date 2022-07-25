@@ -38,7 +38,7 @@ class SnowflakeCredentials(Block):
     """  # noqa E501
 
     _block_type_name = "Snowflake Credentials"
-    _logo_url = "https://github.com/PrefectHQ/orion/blob/main/docs/img/collections/snowflake.png?raw=true"  # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
     account: str
     user: str
