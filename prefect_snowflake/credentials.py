@@ -9,7 +9,7 @@ from snowflake import connector
 
 class SnowflakeCredentials(Block):
     """
-    Dataclass used to manage authentication with Snowflake.
+    Block used to manage authentication with Snowflake.
 
     Args:
         account: The snowflake account name.
