@@ -49,10 +49,10 @@ class SnowflakeCredentials(Block):
         connect_params = {
             "account": self.account,
             "user": self.user,
-            "password": self.password,
+            "password": self.password.get_secret_value(),
             "database": self.database,
             "warehouse": self.warehouse,
-            "private_key": self.private_key,
+            "private_key": self.private_key.get_secret_value(),
             "authenticator": self.authenticator,
             "token": self.token,
             "schema": self.schema_,
