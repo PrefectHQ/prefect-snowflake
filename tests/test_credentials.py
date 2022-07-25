@@ -25,9 +25,10 @@ def snowflake_auth(monkeypatch):
 
 def test_snowflake_credentials_post_init(connection_params):
     snowflake_credentials = SnowflakeCredentials(**connection_params)
+    actual_connection_params = snowflake_credentials.connect_params
     for param in connection_params:
+        actual = actual_connection_params[param]
         expected = connection_params[param]
-        actual = getattr(snowflake_credentials, param)
         assert actual == expected
 
     valid_params = dir(SnowflakeCredentials)
