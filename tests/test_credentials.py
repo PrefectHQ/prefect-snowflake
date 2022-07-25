@@ -28,8 +28,6 @@ def test_snowflake_credentials_post_init(connection_params):
     for param in connection_params:
         expected = connection_params[param]
         actual = getattr(snowflake_credentials, param)
-        if param == "password":
-            actual = actual.get_secret_value()
         assert actual == expected
 
     valid_params = dir(SnowflakeCredentials)

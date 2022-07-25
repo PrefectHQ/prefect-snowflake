@@ -30,6 +30,9 @@ class SnowflakeCredentials(Block):
         autocommit: Whether to automatically commit.
     """  # noqa
 
+    _block_type_name = "Snowflake Credentials"
+    _logo_url = "https://github.com/PrefectHQ/orion/blob/main/docs/img/collections/snowflake.png?raw=true"  # noqa
+
     account: str
     user: str
     password: Optional[SecretStr] = None
@@ -46,15 +49,18 @@ class SnowflakeCredentials(Block):
         """
         Filter out unset values.
         """
+        password = self.password.get_secret_value() if self.password else None
+        private_key = self.private_key.get_secret_value() if self.private_key else None
+        token = self.token.get_secret_value() if self.token else None
         connect_params = {
             "account": self.account,
             "user": self.user,
-            "password": self.password,
+            "password": password,
             "database": self.database,
             "warehouse": self.warehouse,
-            "private_key": self.private_key,
+            "private_key": private_key,
             "authenticator": self.authenticator,
-            "token": self.token,
+            "token": token,
             "schema": self.schema_,
             "role": self.role,
             "autocommit": self.autocommit,
