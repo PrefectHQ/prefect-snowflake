@@ -9,7 +9,7 @@ from snowflake import connector
 
 class SnowflakeCredentials(Block):
     """
-    Dataclass used to manage authentication with Snowflake.
+    Block used to manage authentication with Snowflake.
 
     Args:
         account: The snowflake account name.
@@ -28,7 +28,17 @@ class SnowflakeCredentials(Block):
         schema: The name of the default schema to use.
         role: The name of the default role to use.
         autocommit: Whether to automatically commit.
-    """  # noqa
+
+    Example:
+        Load stored Snowflake credentials:
+        ```python
+        from prefect_snowflake import SnowflakeCredentials
+        snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
+        ```
+    """  # noqa E501
+
+    _block_type_name = "Snowflake Credentials"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
     account: str
     user: str
@@ -46,15 +56,18 @@ class SnowflakeCredentials(Block):
         """
         Filter out unset values.
         """
+        password = self.password.get_secret_value() if self.password else None
+        private_key = self.private_key.get_secret_value() if self.private_key else None
+        token = self.token.get_secret_value() if self.token else None
         connect_params = {
             "account": self.account,
             "user": self.user,
-            "password": self.password,
+            "password": password,
             "database": self.database,
             "warehouse": self.warehouse,
-            "private_key": self.private_key,
+            "private_key": private_key,
             "authenticator": self.authenticator,
-            "token": self.token,
+            "token": token,
             "schema": self.schema_,
             "role": self.role,
             "autocommit": self.autocommit,
