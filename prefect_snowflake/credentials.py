@@ -33,7 +33,7 @@ class SnowflakeCredentials(Block):
         Load stored Snowflake credentials:
         ```python
         from prefect_snowflake import SnowflakeCredentials
-        snowflake_credentials_block = SnowflakeCredentials.load("MY_BLOCK_NAME")
+        snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
         ```
     """  # noqa E501
 
