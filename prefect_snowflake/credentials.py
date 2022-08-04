@@ -130,11 +130,9 @@ class SnowflakeCredentials(Block):
                     f"The {param} must be set in either "
                     f"SnowflakeCredentials or the task"
                 )
-        connect_params = {
-            key: val.get_secret_value()
-            if isinstance(val, (SecretBytes, SecretStr))
-            else val
-            for key, val in connect_params.items()
-        }
+        for param in ("password", "private_key", "token"):
+            if param in connect_params:
+                connect_params[param] = connect_params[param].get_secret_value()
+
         connection = connector.connect(**connect_params)
         return connection
