@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Keeping `password`, `token`, and `private_key` as `SecretStr` in `block_initialization` so logging doesn't show secrets - [#22](https://github.com/PrefectHQ/prefect-snowflake/pull/22)
 
 ### Security
 
