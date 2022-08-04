@@ -16,9 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
-- Keeping `password`, `token`, and `private_key` as `SecretStr` in `block_initialization` so logging doesn't show secrets - [#22](https://github.com/PrefectHQ/prefect-snowflake/pull/22)
 
 ### Security
+
+## 0.1.4
+
+Released on August 4th, 2022.
+
+### Fixed
+- Keeping `password`, `token`, and `private_key` as `SecretStr` in `block_initialization` so logging doesn't show secrets - [#22](https://github.com/PrefectHQ/prefect-snowflake/pull/22)
 
 ## 0.1.3
 Released on July 26th, 2022.
