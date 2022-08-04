@@ -7,7 +7,7 @@ from prefect_snowflake.credentials import SnowflakeCredentials
 
 
 @pytest.fixture()
-def connection_params():
+def connect_params():
     return {
         "account": "account",
         "user": "user",
@@ -24,12 +24,12 @@ def snowflake_auth(monkeypatch):
     monkeypatch.setattr("snowflake.connector.connection.Auth", auth_mock)
 
 
-def test_snowflake_credentials_post_init(connection_params):
-    snowflake_credentials = SnowflakeCredentials(**connection_params)
-    actual_connection_params = snowflake_credentials.connect_params
-    for param in connection_params:
-        actual = actual_connection_params[param]
-        expected = connection_params[param]
+def test_snowflake_credentials_get_connect_params(connect_params):
+    snowflake_credentials = SnowflakeCredentials(**connect_params)
+    actual_connect_params = snowflake_credentials._get_connect_params()
+    for param in connect_params:
+        actual = actual_connect_params[param]
+        expected = connect_params[param]
         if isinstance(actual, SecretStr):
             actual = actual.get_secret_value()
         assert actual == expected
@@ -51,39 +51,43 @@ def test_snowflake_credentials_post_init(connection_params):
             assert snowflake_credentials.connect_params[param] == expected
 
 
-def test_snowflake_credentials_get_connection_override(
-    snowflake_auth, connection_params
+def test_snowflake_credentials_validate_auth_kwargs(snowflake_auth, connect_params):
+    connect_params_missing = connect_params.copy()
+    connect_params_missing.pop("password")
+    with pytest.raises(ValueError, match="One of the authentication keys"):
+        SnowflakeCredentials(**connect_params_missing)
+
+
+def test_snowflake_credentials_get_connect_params_override(
+    snowflake_auth, connect_params
 ):
-    connection = SnowflakeCredentials(**connection_params).get_connection(
+    snowflake_credentials = SnowflakeCredentials(**connect_params)
+    new_connect_params = snowflake_credentials._get_connect_params(
         database="override_database", warehouse="override_warehouse"
     )
 
-    for param in connection_params:
-        if param == "password":
-            continue
-        expected = connection_params[param]
-        if param in ["database", "warehouse"]:
-            expected = f"override_{expected}"
-        assert getattr(connection, param) == expected
+    for param in ["database", "warehouse"]:
+        actual = new_connect_params[param]
+        expected = "override_" + connect_params[param]
+        assert actual == expected
 
 
-def test_snowflake_credentials_get_connection_missing_auth(
-    snowflake_auth, connection_params
+def test_snowflake_credentials_get_connect_params_get_secret_value(
+    snowflake_auth, connect_params
 ):
-    connection_params_missing = connection_params.copy()
-    connection_params_missing.pop("password")
-    with pytest.raises(ValueError, match="One of the authentication methods"):
-        SnowflakeCredentials(**connection_params_missing).get_connection()
+    snowflake_credentials = SnowflakeCredentials(**connect_params)
+    connect_params = snowflake_credentials._get_connect_params()
+    assert connect_params["password"] == "password"
 
 
 @pytest.mark.parametrize("param", ("database", "warehouse"))
-def test_snowflake_credentials_get_connection_missing_input(
-    snowflake_auth, connection_params, param
+def test_snowflake_credentials_get_connect_params_missing_input(
+    snowflake_auth, connect_params, param
 ):
-    connection_params_missing = connection_params.copy()
-    connection_params_missing.pop(param)
+    connect_params_missing = connect_params.copy()
+    connect_params_missing.pop(param)
     with pytest.raises(ValueError, match=f"The {param} must be set in either"):
-        SnowflakeCredentials(**connection_params_missing).get_connection()
+        SnowflakeCredentials(**connect_params_missing)._get_connect_params()
 
 
 def test_snowflake_password_is_secret_str():
@@ -91,6 +95,6 @@ def test_snowflake_password_is_secret_str():
     credentials = SnowflakeCredentials(
         account="name_of_account", user="user", password=password
     )
-    connect_params_password = credentials.connect_params["password"]
+    connect_params_password = credentials.password
     assert isinstance(connect_params_password, SecretStr)
     assert connect_params_password.get_secret_value() == password

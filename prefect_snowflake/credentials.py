@@ -1,9 +1,9 @@
 """Credentials class to authenticate Snowflake."""
 
-from typing import Optional
+from typing import Dict, Optional
 
 from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr
+from pydantic import Field, SecretBytes, SecretStr, root_validator
 from snowflake import connector
 
 
@@ -52,9 +52,24 @@ class SnowflakeCredentials(Block):
     role: Optional[str] = None
     autocommit: Optional[bool] = None
 
-    def block_initialization(self):
+    @root_validator(pre=True)
+    def _validate_auth_kwargs(cls, values):
         """
-        Filter out unset values.
+        Ensure an authorization value has been provided by the user.
+        """
+        auth_params = ("password", "private_key", "authenticator", "token")
+        if not any(values.get(param) for param in auth_params):
+            auth_str = ", ".join(auth_params)
+            raise ValueError(
+                f"One of the authentication keys must be provided: {auth_str}\n"
+            )
+        return values
+
+    def _get_connect_params(
+        self, database: Optional[str] = None, warehouse: Optional[str] = None
+    ) -> Dict[str, str]:
+        """
+        Creates a connect params mapping to pass into get_connection.
         """
         connect_params = {
             "account": self.account,
@@ -73,15 +88,28 @@ class SnowflakeCredentials(Block):
         }
 
         # filter out unset values
-        self.connect_params = {
+        connect_params = {
             param: value for param, value in connect_params.items() if value is not None
         }
 
-        auth_params = ("password", "private_key", "authenticator", "token")
-        if not any(param in self.connect_params for param in auth_params):
-            raise ValueError(
-                f"One of the authentication methods must be used: {auth_params}"
-            )
+        # override specific values
+        if database is not None:
+            connect_params["database"] = database
+        if warehouse is not None:
+            connect_params["warehouse"] = warehouse
+
+        for param in ("password", "private_key", "token"):
+            if param in connect_params:
+                connect_params[param] = connect_params[param].get_secret_value()
+
+        for param in ("database", "warehouse"):
+            if param not in connect_params:
+                raise ValueError(
+                    f"The {param} must be set in either "
+                    f"SnowflakeCredentials or the task"
+                )
+
+        return connect_params
 
     def get_connection(
         self, database: Optional[str] = None, warehouse: Optional[str] = None
@@ -118,21 +146,8 @@ class SnowflakeCredentials(Block):
             snowflake_credentials_flow()
             ```
         """
-        # dont contaminate the original definition
-        connect_params = self.connect_params.copy()
-        if database is not None:
-            connect_params["database"] = database
-        if warehouse is not None:
-            connect_params["warehouse"] = warehouse
-        for param in ("database", "warehouse"):
-            if param not in connect_params:
-                raise ValueError(
-                    f"The {param} must be set in either "
-                    f"SnowflakeCredentials or the task"
-                )
-        for param in ("password", "private_key", "token"):
-            if param in connect_params:
-                connect_params[param] = connect_params[param].get_secret_value()
-
+        connect_params = self._get_connect_params(
+            database=database, warehouse=warehouse
+        )
         connection = connector.connect(**connect_params)
         return connection
