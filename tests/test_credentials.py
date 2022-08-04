@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from pydantic import SecretStr
 
 from prefect_snowflake.credentials import SnowflakeCredentials
 
@@ -29,7 +30,7 @@ def test_snowflake_credentials_post_init(connection_params):
     for param in connection_params:
         actual = actual_connection_params[param]
         expected = connection_params[param]
-        if not isinstance(actual, str):
+        if isinstance(actual, SecretStr):
             actual = actual.get_secret_value()
         assert actual == expected
 
@@ -83,3 +84,13 @@ def test_snowflake_credentials_get_connection_missing_input(
     connection_params_missing.pop(param)
     with pytest.raises(ValueError, match=f"The {param} must be set in either"):
         SnowflakeCredentials(**connection_params_missing).get_connection()
+
+
+def test_snowflake_password_is_secret_str():
+    password = "dontshowthis"
+    credentials = SnowflakeCredentials(
+        account="name_of_account", user="user", password=password
+    )
+    connect_params_password = credentials.connect_params["password"]
+    assert isinstance(connect_params_password, SecretStr)
+    assert connect_params_password.get_secret_value() == password
