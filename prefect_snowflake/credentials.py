@@ -56,18 +56,15 @@ class SnowflakeCredentials(Block):
         """
         Filter out unset values.
         """
-        password = self.password.get_secret_value() if self.password else None
-        private_key = self.private_key.get_secret_value() if self.private_key else None
-        token = self.token.get_secret_value() if self.token else None
         connect_params = {
             "account": self.account,
             "user": self.user,
-            "password": password,
+            "password": self.password,
             "database": self.database,
             "warehouse": self.warehouse,
-            "private_key": private_key,
+            "private_key": self.private_key,
             "authenticator": self.authenticator,
-            "token": token,
+            "token": self.token,
             "schema": self.schema_,
             "role": self.role,
             "autocommit": self.autocommit,
@@ -127,13 +124,15 @@ class SnowflakeCredentials(Block):
             connect_params["database"] = database
         if warehouse is not None:
             connect_params["warehouse"] = warehouse
-
         for param in ("database", "warehouse"):
             if param not in connect_params:
                 raise ValueError(
                     f"The {param} must be set in either "
                     f"SnowflakeCredentials or the task"
                 )
+        for param in ("password", "private_key", "token"):
+            if param in connect_params:
+                connect_params[param] = connect_params[param].get_secret_value()
 
         connection = connector.connect(**connect_params)
         return connection
