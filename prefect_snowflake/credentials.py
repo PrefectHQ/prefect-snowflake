@@ -16,8 +16,6 @@ class SnowflakeCredentials(Block):
         user: The user name used to authenticate.
         password: The password used to authenticate.
         private_key: The PEM used to authenticate.
-        database: The name of the default database to use.
-        warehouse: The name of the default warehouse to use.
         authenticator: The type of authenticator to use for initializing
             connection (oauth, externalbrowser, etc); refer to
             [Snowflake documentation](https://docs.snowflake.com/en/user-guide/python-connector-api.html#connect)
@@ -25,7 +23,6 @@ class SnowflakeCredentials(Block):
             work in an environment where a browser is available.
         token: The OAuth or JWT Token to provide when
             authenticator is set to OAuth.
-        schema: The name of the default schema to use.
         role: The name of the default role to use.
         autocommit: Whether to automatically commit.
 
@@ -43,12 +40,9 @@ class SnowflakeCredentials(Block):
     account: str
     user: str
     password: Optional[SecretStr] = None
-    database: Optional[str] = None
-    warehouse: Optional[str] = None
     private_key: Optional[SecretBytes] = None
     authenticator: Optional[str] = None
     token: Optional[SecretStr] = None
-    schema_: Optional[str] = Field(alias="schema")
     role: Optional[str] = None
     autocommit: Optional[bool] = None
 
@@ -65,9 +59,46 @@ class SnowflakeCredentials(Block):
             )
         return values
 
-    def _get_connect_params(
-        self, database: Optional[str] = None, warehouse: Optional[str] = None
-    ) -> Dict[str, str]:
+
+class SnowflakeConnector(SnowflakeCredentials):
+
+    """
+    Block used to manage connections with Snowflake.
+
+    Args:
+        database: The name of the default database to use.
+        warehouse: The name of the default warehouse to use.
+        schema: The name of the default schema to use.
+
+    Example:
+        Load stored Snowflake connector:
+        ```python
+        from prefect_snowflake import SnowflakeConnector
+        snowflake_connector_block = SnowflakeConnector.load("BLOCK_NAME")
+        ```
+    """
+
+    _block_type_name = "Snowflake Connector"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
+
+    database: Optional[str] = None
+    warehouse: Optional[str] = None
+    schema_: Optional[str] = Field(alias="schema")
+
+    @root_validator(pre=True)
+    def _validate_connector_kwargs(cls, values):
+        """
+        Ensure connector values has been provided by the user.
+        """
+        connector_params = ("database", "warehouse")
+        if not all(values.get(param) for param in connector_params):
+            connector_str = ", ".join(connector_params)
+            raise ValueError(
+                f"Both of the connector keys must be provided: {connector_str}\n"
+            )
+        return values
+
+    def _get_connect_params(self) -> Dict[str, str]:
         """
         Creates a connect params mapping to pass into get_connection.
         """
@@ -92,28 +123,13 @@ class SnowflakeCredentials(Block):
             param: value for param, value in connect_params.items() if value is not None
         }
 
-        # override specific values
-        if database is not None:
-            connect_params["database"] = database
-        if warehouse is not None:
-            connect_params["warehouse"] = warehouse
-
         for param in ("password", "private_key", "token"):
             if param in connect_params:
                 connect_params[param] = connect_params[param].get_secret_value()
 
-        for param in ("database", "warehouse"):
-            if param not in connect_params:
-                raise ValueError(
-                    f"The {param} must be set in either "
-                    f"SnowflakeCredentials or the task"
-                )
-
         return connect_params
 
-    def get_connection(
-        self, database: Optional[str] = None, warehouse: Optional[str] = None
-    ) -> connector.SnowflakeConnection:
+    def get_connection(self) -> connector.SnowflakeConnection:
         """
         Returns an authenticated connection that can be
         used to query from Snowflake databases.
@@ -130,24 +146,22 @@ class SnowflakeCredentials(Block):
         Examples:
             ```python
             from prefect import flow
-            from prefect_snowflake import SnowflakeCredentials
+            from prefect_snowflake import SnowflakeConnector
 
             @flow
-            def snowflake_credentials_flow():
-                snowflake_credentials = SnowflakeCredentials(
+            def snowflake_connector_flow():
+                snowflake_connector = SnowflakeConnector(
                     account="account",
                     user="user",
                     password="password",
                     database="database",
                     warehouse="warehouse",
                 )
-                return snowflake_credentials
+                return snowflake_connector
 
-            snowflake_credentials_flow()
+            snowflake_connector_flow()
             ```
         """
-        connect_params = self._get_connect_params(
-            database=database, warehouse=warehouse
-        )
+        connect_params = self._get_connect_params()
         connection = connector.connect(**connect_params)
         return connection

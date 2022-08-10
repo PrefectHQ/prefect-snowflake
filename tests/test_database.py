@@ -48,18 +48,18 @@ class SnowflakeConnection:
 
 
 @pytest.fixture()
-def snowflake_credentials():
-    snowflake_credentials_mock = MagicMock()
-    snowflake_credentials_mock.get_connection.return_value = SnowflakeConnection()
-    return snowflake_credentials_mock
+def snowflake_connector():
+    snowflake_connector_mock = MagicMock()
+    snowflake_connector_mock.get_connection.return_value = SnowflakeConnection()
+    return snowflake_connector_mock
 
 
-def test_snowflake_query(snowflake_credentials):
+def test_snowflake_query(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_query(
             "query",
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
         )
         return result
@@ -69,12 +69,12 @@ def test_snowflake_query(snowflake_credentials):
     assert result[0][1] == ("param",)
 
 
-def test_snowflake_multiquery(snowflake_credentials):
+def test_snowflake_multiquery(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
         )
         return result
@@ -86,12 +86,12 @@ def test_snowflake_multiquery(snowflake_credentials):
     assert result[1][0][1] == ("param",)
 
 
-def test_snowflake_multiquery_transaction(snowflake_credentials):
+def test_snowflake_multiquery_transaction(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
             as_transaction=True,
         )
@@ -105,13 +105,13 @@ def test_snowflake_multiquery_transaction(snowflake_credentials):
 
 
 def test_snowflake_multiquery_transaction_with_transaction_control_results(
-    snowflake_credentials,
+    snowflake_connector,
 ):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
             as_transaction=True,
             return_transaction_control_results=True,

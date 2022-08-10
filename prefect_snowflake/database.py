@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from prefect import task
 from snowflake.connector.cursor import SnowflakeCursor
 
-from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.credentials import SnowflakeConnector
 
 BEGIN_TRANSACTION_STATEMENT = "BEGIN TRANSACTION"
 END_TRANSACTION_STATEMENT = "COMMIT"
@@ -15,7 +15,7 @@ END_TRANSACTION_STATEMENT = "COMMIT"
 @task
 async def snowflake_query(
     query: str,
-    snowflake_credentials: "SnowflakeCredentials",
+    snowflake_connector: "SnowflakeConnector",
     params: Union[Tuple[Any], Dict[str, Any]] = None,
     cursor_type: Optional[SnowflakeCursor] = SnowflakeCursor,
     database: Optional[str] = None,
@@ -27,7 +27,7 @@ async def snowflake_query(
     Args:
         query: The query to execute against the database.
         params: The params to replace the placeholders in the query.
-        snowflake_credentials: The credentials to use to authenticate.
+        snowflake_connector: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
         database: The name of the database to use; overrides
             the credentials definition if provided.
@@ -41,13 +41,13 @@ async def snowflake_query(
         Query Snowflake table with the ID value parameterized.
         ```python
         from prefect import flow
-        from prefect_snowflake import SnowflakeCredentials
+        from prefect_snowflake import SnowflakeConnector
         from prefect_snowflake.database import snowflake_query
 
 
         @flow
         def snowflake_query_flow():
-            snowflake_credentials = SnowflakeCredentials(
+            snowflake_connector = SnowflakeConnector(
                 account="account",
                 user="user",
                 password="password",
@@ -56,7 +56,7 @@ async def snowflake_query(
             )
             result = snowflake_query(
                 "SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;",
-                snowflake_credentials,
+                snowflake_connector,
                 params={"id_param": 1}
             )
             return result
@@ -66,7 +66,7 @@ async def snowflake_query(
     """
     connect_params = {"database": database, "warehouse": warehouse}
     # context manager automatically rolls back failed transactions and closes
-    with snowflake_credentials.get_connection(**connect_params) as connection:
+    with snowflake_connector.get_connection(**connect_params) as connection:
         with connection.cursor(cursor_type) as cursor:
             response = cursor.execute_async(query, params=params)
             query_id = response["queryId"]
@@ -82,7 +82,7 @@ async def snowflake_query(
 @task
 async def snowflake_multiquery(
     queries: List[str],
-    snowflake_credentials: "SnowflakeCredentials",
+    snowflake_connector: "SnowflakeConnector",
     params: Union[Tuple[Any], Dict[str, Any]] = None,
     cursor_type: Optional[SnowflakeCursor] = SnowflakeCursor,
     database: Optional[str] = None,
@@ -97,7 +97,7 @@ async def snowflake_multiquery(
     Args:
         queries: The list of queries to execute against the database.
         params: The params to replace the placeholders in the query.
-        snowflake_credentials: The credentials to use to authenticate.
+        snowflake_connector: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
         database: The name of the database to use; overrides
             the credentials definition if provided.
@@ -114,13 +114,13 @@ async def snowflake_multiquery(
         Query Snowflake table with the ID value parameterized.
         ```python
         from prefect import flow
-        from prefect_snowflake import SnowflakeCredentials
+        from prefect_snowflake import SnowflakeConnector
         from prefect_snowflake.database import snowflake_multiquery
 
 
         @flow
         def snowflake_multiquery_flow():
-            snowflake_credentials = SnowflakeCredentials(
+            snowflake_connector = SnowflakeConnector(
                 account="account",
                 user="user",
                 password="password",
@@ -129,7 +129,7 @@ async def snowflake_multiquery(
             )
             result = snowflake_multiquery(
                 ["SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;", "SELECT 1,2"],
-                snowflake_credentials,
+                snowflake_connector,
                 params={"id_param": 1},
                 as_transaction=True
             )
@@ -139,7 +139,7 @@ async def snowflake_multiquery(
         ```
     """
     connect_params = {"database": database, "warehouse": warehouse}
-    with snowflake_credentials.get_connection(**connect_params) as connection:
+    with snowflake_connector.get_connection(**connect_params) as connection:
         if as_transaction:
             queries.insert(0, BEGIN_TRANSACTION_STATEMENT)
             queries.append(END_TRANSACTION_STATEMENT)
