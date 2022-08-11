@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SnowflakeConnector` block - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 
 ### Changed
-- Moved the keywords, `database` and `warehouse`, from `SnowflakeCredentials` into `SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
-- Moved the method `get_connection` from `SnowflakeCredentials` into `SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- Moved the keywords, `database` and `warehouse`, from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- Moved the method `get_connection` from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 
 ### Deprecated
 
