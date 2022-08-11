@@ -74,11 +74,3 @@ def test_snowflake_connector_get_connect_params_get_secret_value(connector_param
     snowflake_credentials = SnowflakeConnector(**connector_params)
     connector_params = snowflake_credentials._get_connect_params()
     assert connector_params["password"] == "password"
-
-
-@pytest.mark.parametrize("param", ("database", "warehouse"))
-def test_snowflake_connector_get_connect_params_missing_input(connector_params, param):
-    connector_params_missing = connector_params.copy()
-    connector_params_missing.pop(param)
-    with pytest.raises(ValueError, match="Both of the connector keys"):
-        SnowflakeConnector(**connector_params_missing)

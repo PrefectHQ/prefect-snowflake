@@ -81,22 +81,9 @@ class SnowflakeConnector(SnowflakeCredentials):
     _block_type_name = "Snowflake Connector"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
-    database: Optional[str] = None
-    warehouse: Optional[str] = None
+    database: str
+    warehouse: str
     schema_: Optional[str] = Field(alias="schema")
-
-    @root_validator(pre=True)
-    def _validate_connector_kwargs(cls, values):
-        """
-        Ensure connector values has been provided by the user.
-        """
-        connector_params = ("database", "warehouse")
-        if not all(values.get(param) for param in connector_params):
-            connector_str = ", ".join(connector_params)
-            raise ValueError(
-                f"Both of the connector keys must be provided: {connector_str}\n"
-            )
-        return values
 
     def _get_connect_params(self) -> Dict[str, str]:
         """
