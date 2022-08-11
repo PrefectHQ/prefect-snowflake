@@ -3,28 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from pydantic import SecretStr
 
-from prefect_snowflake.credentials import SnowflakeConnector, SnowflakeCredentials
-
-
-@pytest.fixture()
-def credentials_params():
-    return {
-        "account": "account",
-        "user": "user",
-        "password": "password",
-    }
-
-
-@pytest.fixture()
-def connector_params(credentials_params):
-    snowflake_credentials = SnowflakeCredentials(**credentials_params)
-    _connector_params = {
-        "schema": "schema_input",
-        "database": "database",
-        "warehouse": "warehouse",
-        "credentials": snowflake_credentials,
-    }
-    return _connector_params
+from prefect_snowflake.credentials import SnowflakeCredentials
 
 
 @pytest.fixture
@@ -50,29 +29,3 @@ def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
     credentials_params_missing.pop("password")
     with pytest.raises(ValueError, match="One of the authentication keys"):
         SnowflakeCredentials(**credentials_params_missing)
-
-
-def test_snowflake_connector_init(connector_params):
-    snowflake_connector = SnowflakeConnector(**connector_params)
-    actual_connector_params = snowflake_connector.dict()
-    for param in connector_params:
-        expected = connector_params[param]
-        if param == "schema":
-            param = "schema_"
-        actual = actual_connector_params[param]
-        if isinstance(actual, SecretStr):
-            actual = actual.get_secret_value()
-        assert actual == expected
-
-
-def test_snowflake_connector_password_is_secret_str(connector_params):
-    snowflake_connector = SnowflakeConnector(**connector_params)
-    password = snowflake_connector.credentials.password
-    assert isinstance(password, SecretStr)
-    assert password.get_secret_value() == "password"
-
-
-def test_snowflake_connector_get_connect_params_get_secret_value(connector_params):
-    snowflake_connector = SnowflakeConnector(**connector_params)
-    connector_params = snowflake_connector._get_connect_params()
-    assert connector_params["password"] == "password"

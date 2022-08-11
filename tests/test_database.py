@@ -2,13 +2,41 @@ from unittest.mock import MagicMock
 
 import pytest
 from prefect import flow
+from pydantic import SecretStr
 
 from prefect_snowflake.database import (
     BEGIN_TRANSACTION_STATEMENT,
     END_TRANSACTION_STATEMENT,
+    SnowflakeConnector,
     snowflake_multiquery,
     snowflake_query,
 )
+
+
+def test_snowflake_connector_init(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    actual_connector_params = snowflake_connector.dict()
+    for param in connector_params:
+        expected = connector_params[param]
+        if param == "schema":
+            param = "schema_"
+        actual = actual_connector_params[param]
+        if isinstance(actual, SecretStr):
+            actual = actual.get_secret_value()
+        assert actual == expected
+
+
+def test_snowflake_connector_password_is_secret_str(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    password = snowflake_connector.credentials.password
+    assert isinstance(password, SecretStr)
+    assert password.get_secret_value() == "password"
+
+
+def test_snowflake_connector_get_connect_params_get_secret_value(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    connector_params = snowflake_connector._get_connect_params()
+    assert connector_params["password"] == "password"
 
 
 class SnowflakeCursor:
