@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 ### Removed
+- Removed the keywords, `database` and `warehouse`, from `snowflake_query` and `snowflake_multiquery` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 
 ### Fixed
 
