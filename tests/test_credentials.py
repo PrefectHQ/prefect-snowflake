@@ -17,13 +17,13 @@ def credentials_params():
 
 @pytest.fixture()
 def connector_params(credentials_params):
-    _connector_params = credentials_params.copy()
-    _connector_params.update(
-        {
-            "database": "database",
-            "warehouse": "warehouse",
-        }
-    )
+    snowflake_credentials = SnowflakeCredentials(**credentials_params)
+    _connector_params = {
+        "schema": "schema_input",
+        "database": "database",
+        "warehouse": "warehouse",
+        "credentials": snowflake_credentials,
+    }
     return _connector_params
 
 
@@ -53,24 +53,26 @@ def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
 
 
 def test_snowflake_connector_init(connector_params):
-    snowflake_credentials = SnowflakeConnector(**connector_params)
-    actual_connector_params = snowflake_credentials.dict()
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    actual_connector_params = snowflake_connector.dict()
     for param in connector_params:
-        actual = actual_connector_params[param]
         expected = connector_params[param]
+        if param == "schema":
+            param = "schema_"
+        actual = actual_connector_params[param]
         if isinstance(actual, SecretStr):
             actual = actual.get_secret_value()
         assert actual == expected
 
 
 def test_snowflake_connector_password_is_secret_str(connector_params):
-    snowflake_credentials = SnowflakeConnector(**connector_params)
-    password = snowflake_credentials.password
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    password = snowflake_connector.credentials.password
     assert isinstance(password, SecretStr)
     assert password.get_secret_value() == "password"
 
 
 def test_snowflake_connector_get_connect_params_get_secret_value(connector_params):
-    snowflake_credentials = SnowflakeConnector(**connector_params)
-    connector_params = snowflake_credentials._get_connect_params()
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    connector_params = snowflake_connector._get_connect_params()
     assert connector_params["password"] == "password"

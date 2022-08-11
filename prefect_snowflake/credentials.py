@@ -60,7 +60,7 @@ class SnowflakeCredentials(Block):
         return values
 
 
-class SnowflakeConnector(SnowflakeCredentials):
+class SnowflakeConnector(Block):
 
     """
     Block used to manage connections with Snowflake.
@@ -69,6 +69,7 @@ class SnowflakeConnector(SnowflakeCredentials):
         database: The name of the default database to use.
         warehouse: The name of the default warehouse to use.
         schema: The name of the default schema to use.
+        credentials: The credentials to authenticate with Snowflake.
 
     Example:
         Load stored Snowflake connector:
@@ -83,26 +84,20 @@ class SnowflakeConnector(SnowflakeCredentials):
 
     database: str
     warehouse: str
-    schema_: Optional[str] = Field(alias="schema")
+    schema_: str = Field(alias="schema")
+    credentials: SnowflakeCredentials
 
     def _get_connect_params(self) -> Dict[str, str]:
         """
         Creates a connect params mapping to pass into get_connection.
         """
         connect_params = {
-            "account": self.account,
-            "user": self.user,
-            "password": self.password,
             "database": self.database,
             "warehouse": self.warehouse,
-            "private_key": self.private_key,
-            "authenticator": self.authenticator,
-            "token": self.token,
             "schema": self.schema_,
-            "role": self.role,
-            "autocommit": self.autocommit,
             # required to track task's usage in the Snowflake Partner Network Portal
             "application": "Prefect_Snowflake_Collection",
+            **self.credentials.dict(),
         }
 
         # filter out unset values
