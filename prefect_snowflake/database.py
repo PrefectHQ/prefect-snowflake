@@ -42,9 +42,7 @@ class SnowflakeConnector(Block):
     schema_: str = Field(
         alias="schema", description="The name of the default schema to use"
     )
-    credentials: SnowflakeCredentials = Field(
-        ..., description="The credentials to authenticate with Snowflake"
-    )
+    credentials: SnowflakeCredentials
 
     def _get_connect_params(self) -> Dict[str, str]:
         """
