@@ -69,7 +69,7 @@ class SnowflakeConnector(Block):
                 connect_params[param] = connect_params[param].get_secret_value()
 
         # set authenticator to the actual okta_endpoint
-        if connect_params.get("okta_endpoint"):
+        if connect_params.get("authenticator") == "okta_endpoint":
             connect_params["authenticator"] = connect_params.pop("okta_endpoint")
 
         return connect_params
