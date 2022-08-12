@@ -2,13 +2,41 @@ from unittest.mock import MagicMock
 
 import pytest
 from prefect import flow
+from pydantic import SecretStr
 
 from prefect_snowflake.database import (
     BEGIN_TRANSACTION_STATEMENT,
     END_TRANSACTION_STATEMENT,
+    SnowflakeConnector,
     snowflake_multiquery,
     snowflake_query,
 )
+
+
+def test_snowflake_connector_init(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    actual_connector_params = snowflake_connector.dict()
+    for param in connector_params:
+        expected = connector_params[param]
+        if param == "schema":
+            param = "schema_"
+        actual = actual_connector_params[param]
+        if isinstance(actual, SecretStr):
+            actual = actual.get_secret_value()
+        assert actual == expected
+
+
+def test_snowflake_connector_password_is_secret_str(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    password = snowflake_connector.credentials.password
+    assert isinstance(password, SecretStr)
+    assert password.get_secret_value() == "password"
+
+
+def test_snowflake_connector_get_connect_params_get_secret_value(connector_params):
+    snowflake_connector = SnowflakeConnector(**connector_params)
+    connector_params = snowflake_connector._get_connect_params()
+    assert connector_params["password"] == "password"
 
 
 class SnowflakeCursor:
@@ -48,18 +76,18 @@ class SnowflakeConnection:
 
 
 @pytest.fixture()
-def snowflake_credentials():
-    snowflake_credentials_mock = MagicMock()
-    snowflake_credentials_mock.get_connection.return_value = SnowflakeConnection()
-    return snowflake_credentials_mock
+def snowflake_connector():
+    snowflake_connector_mock = MagicMock()
+    snowflake_connector_mock.get_connection.return_value = SnowflakeConnection()
+    return snowflake_connector_mock
 
 
-def test_snowflake_query(snowflake_credentials):
+def test_snowflake_query(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_query(
             "query",
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
         )
         return result
@@ -69,12 +97,12 @@ def test_snowflake_query(snowflake_credentials):
     assert result[0][1] == ("param",)
 
 
-def test_snowflake_multiquery(snowflake_credentials):
+def test_snowflake_multiquery(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
         )
         return result
@@ -86,12 +114,12 @@ def test_snowflake_multiquery(snowflake_credentials):
     assert result[1][0][1] == ("param",)
 
 
-def test_snowflake_multiquery_transaction(snowflake_credentials):
+def test_snowflake_multiquery_transaction(snowflake_connector):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
             as_transaction=True,
         )
@@ -105,13 +133,13 @@ def test_snowflake_multiquery_transaction(snowflake_credentials):
 
 
 def test_snowflake_multiquery_transaction_with_transaction_control_results(
-    snowflake_credentials,
+    snowflake_connector,
 ):
     @flow
     def test_flow():
         result = snowflake_multiquery(
             ["query1", "query2"],
-            snowflake_credentials,
+            snowflake_connector,
             params=("param",),
             as_transaction=True,
             return_transaction_control_results=True,

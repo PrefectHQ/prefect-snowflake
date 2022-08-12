@@ -26,8 +26,8 @@ pip install prefect-snowflake
 
 ```python
 from prefect import flow
-from prefect_snowflake import SnowflakeCredentials
-from prefect_snowflake.database import snowflake_query
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query
 
 
 @flow
@@ -37,9 +37,15 @@ def snowflake_query_flow():
         user="user",
         password="password",
     )
+    snowflake_connector = SnowflakeConnector(
+        database="database",
+        warehouse="warehouse",
+        schema="schema",
+        credentials=snowflake_credentials
+    )
     result = snowflake_query(
         "SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;",
-        snowflake_credentials,
+        snowflake_connector,
         params={"id_param": 1}
     )
     return result
