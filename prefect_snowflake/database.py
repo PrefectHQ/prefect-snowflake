@@ -1,25 +1,123 @@
 """Module for querying against Snowflake database."""
 
 import asyncio
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
+import snowflake.connector
 from prefect import task
+from prefect.blocks.core import Block
+from pydantic import Field
 from snowflake.connector.cursor import SnowflakeCursor
 
-from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake import SnowflakeCredentials
 
 BEGIN_TRANSACTION_STATEMENT = "BEGIN TRANSACTION"
 END_TRANSACTION_STATEMENT = "COMMIT"
 
 
+class SnowflakeConnector(Block):
+
+    """
+    Block used to manage connections with Snowflake.
+
+    Args:
+        database (str): The name of the default database to use.
+        warehouse (str): The name of the default warehouse to use.
+        schema (str): The name of the default schema to use.
+        credentials (SnowflakeCredentials): The credentials to authenticate with Snowflake.
+
+    Example:
+        Load stored Snowflake connector:
+        ```python
+        from prefect_snowflake import SnowflakeConnector
+        snowflake_connector_block = SnowflakeConnector.load("BLOCK_NAME")
+        ```
+    """  # noqa
+
+    _block_type_name = "Snowflake Connector"
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
+
+    database: str = Field(..., descriptions="The name of the default database to use")
+    warehouse: str = Field(..., description="The name of the default warehouse to use")
+    schema_: str = Field(
+        alias="schema", description="The name of the default schema to use"
+    )
+    credentials: SnowflakeCredentials = Field(
+        ..., description="The credentials to authenticate with Snowflake"
+    )
+
+    def _get_connect_params(self) -> Dict[str, str]:
+        """
+        Creates a connect params mapping to pass into get_connection.
+        """
+        connect_params = {
+            "database": self.database,
+            "warehouse": self.warehouse,
+            "schema": self.schema_,
+            # required to track task's usage in the Snowflake Partner Network Portal
+            "application": "Prefect_Snowflake_Collection",
+            **self.credentials.dict(),
+        }
+
+        # filter out unset values
+        connect_params = {
+            param: value for param, value in connect_params.items() if value is not None
+        }
+
+        for param in ("password", "private_key", "token"):
+            if param in connect_params:
+                connect_params[param] = connect_params[param].get_secret_value()
+
+        # set authenticator to the actual okta_endpoint
+        if connect_params.get("authenticator") == "okta_endpoint":
+            connect_params["authenticator"] = connect_params.pop("okta_endpoint")
+
+        return connect_params
+
+    def get_connection(self) -> snowflake.connector.SnowflakeConnection:
+        """
+        Returns an authenticated connection that can be
+        used to query from Snowflake databases.
+
+        Returns:
+            The authenticated SnowflakeConnection.
+
+        Examples:
+            ```python
+            from prefect import flow
+            from prefect_snowflake.credentials import SnowflakeCredentials
+            from prefect_snowflake.database import SnowflakeConnector
+
+
+            @flow
+            def get_connection_flow():
+                snowflake_credentials = SnowflakeCredentials(
+                    account="account",
+                    user="user",
+                    password="password",
+                )
+                snowflake_connector = SnowflakeConnector(
+                    database="database",
+                    warehouse="warehouse",
+                    schema="schema",
+                    credentials=snowflake_credentials
+                )
+                print(snowflake_connector.get_connection())
+
+            get_connection_flow()
+            ```
+        """
+        connect_params = self._get_connect_params()
+        connection = snowflake.connector.connect(**connect_params)
+        return connection
+
+
 @task
 async def snowflake_query(
     query: str,
-    snowflake_credentials: "SnowflakeCredentials",
+    snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: Optional[SnowflakeCursor] = SnowflakeCursor,
-    database: Optional[str] = None,
-    warehouse: Optional[str] = None,
+    cursor_type: SnowflakeCursor = SnowflakeCursor,
 ) -> List[Tuple[Any]]:
     """
     Executes a query against a Snowflake database.
@@ -27,12 +125,8 @@ async def snowflake_query(
     Args:
         query: The query to execute against the database.
         params: The params to replace the placeholders in the query.
-        snowflake_credentials: The credentials to use to authenticate.
+        snowflake_connector: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
-        database: The name of the database to use; overrides
-            the credentials definition if provided.
-        warehouse: The name of the warehouse to use; overrides
-            the credentials definition if provided.
 
     Returns:
         The output of `response.fetchall()`.
@@ -41,8 +135,8 @@ async def snowflake_query(
         Query Snowflake table with the ID value parameterized.
         ```python
         from prefect import flow
-        from prefect_snowflake import SnowflakeCredentials
-        from prefect_snowflake.database import snowflake_query
+        from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.database import SnowflakeConnector, snowflake_query
 
 
         @flow
@@ -51,12 +145,16 @@ async def snowflake_query(
                 account="account",
                 user="user",
                 password="password",
+            )
+            snowflake_connector = SnowflakeConnector(
                 database="database",
                 warehouse="warehouse",
+                schema="schema",
+                credentials=snowflake_credentials
             )
             result = snowflake_query(
                 "SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;",
-                snowflake_credentials,
+                snowflake_connector,
                 params={"id_param": 1}
             )
             return result
@@ -64,9 +162,8 @@ async def snowflake_query(
         snowflake_query_flow()
         ```
     """
-    connect_params = {"database": database, "warehouse": warehouse}
     # context manager automatically rolls back failed transactions and closes
-    with snowflake_credentials.get_connection(**connect_params) as connection:
+    with snowflake_connector.get_connection() as connection:
         with connection.cursor(cursor_type) as cursor:
             response = cursor.execute_async(query, params=params)
             query_id = response["queryId"]
@@ -82,11 +179,9 @@ async def snowflake_query(
 @task
 async def snowflake_multiquery(
     queries: List[str],
-    snowflake_credentials: "SnowflakeCredentials",
+    snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: Optional[SnowflakeCursor] = SnowflakeCursor,
-    database: Optional[str] = None,
-    warehouse: Optional[str] = None,
+    cursor_type: SnowflakeCursor = SnowflakeCursor,
     as_transaction: bool = False,
     return_transaction_control_results: bool = False,
 ) -> List[List[Tuple[Any]]]:
@@ -97,12 +192,8 @@ async def snowflake_multiquery(
     Args:
         queries: The list of queries to execute against the database.
         params: The params to replace the placeholders in the query.
-        snowflake_credentials: The credentials to use to authenticate.
+        snowflake_connector: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
-        database: The name of the database to use; overrides
-            the credentials definition if provided.
-        warehouse: The name of the warehouse to use; overrides
-            the credentials definition if provided.
         as_transaction: If True, queries are executed in a transaction.
         return_transaction_control_results: Determines if the results of queries
             controlling the transaction (BEGIN/COMMIT) should be returned.
@@ -114,8 +205,8 @@ async def snowflake_multiquery(
         Query Snowflake table with the ID value parameterized.
         ```python
         from prefect import flow
-        from prefect_snowflake import SnowflakeCredentials
-        from prefect_snowflake.database import snowflake_multiquery
+        from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.database import SnowflakeConnector, snowflake_multiquery
 
 
         @flow
@@ -124,12 +215,16 @@ async def snowflake_multiquery(
                 account="account",
                 user="user",
                 password="password",
+            )
+            snowflake_connector = SnowflakeConnector(
                 database="database",
                 warehouse="warehouse",
+                schema="schema",
+                credentials=snowflake_credentials
             )
             result = snowflake_multiquery(
                 ["SELECT * FROM table WHERE id=%{id_param}s LIMIT 8;", "SELECT 1,2"],
-                snowflake_credentials,
+                snowflake_connector,
                 params={"id_param": 1},
                 as_transaction=True
             )
@@ -138,8 +233,7 @@ async def snowflake_multiquery(
         snowflake_multiquery_flow()
         ```
     """
-    connect_params = {"database": database, "warehouse": warehouse}
-    with snowflake_credentials.get_connection(**connect_params) as connection:
+    with snowflake_connector.get_connection() as connection:
         if as_transaction:
             queries.insert(0, BEGIN_TRANSACTION_STATEMENT)
             queries.append(END_TRANSACTION_STATEMENT)

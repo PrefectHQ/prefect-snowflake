@@ -6,17 +6,6 @@ from pydantic import SecretStr
 from prefect_snowflake.credentials import SnowflakeCredentials
 
 
-@pytest.fixture()
-def connection_params():
-    return {
-        "account": "account",
-        "user": "user",
-        "password": "password",
-        "database": "database",
-        "warehouse": "warehouse",
-    }
-
-
 @pytest.fixture
 def snowflake_auth(monkeypatch):
     auth_mock = MagicMock()
@@ -24,73 +13,43 @@ def snowflake_auth(monkeypatch):
     monkeypatch.setattr("snowflake.connector.connection.Auth", auth_mock)
 
 
-def test_snowflake_credentials_post_init(connection_params):
-    snowflake_credentials = SnowflakeCredentials(**connection_params)
-    actual_connection_params = snowflake_credentials.connect_params
-    for param in connection_params:
-        actual = actual_connection_params[param]
-        expected = connection_params[param]
+def test_snowflake_credentials_init(credentials_params):
+    snowflake_credentials = SnowflakeCredentials(**credentials_params)
+    actual_credentials_params = snowflake_credentials.dict()
+    for param in credentials_params:
+        actual = actual_credentials_params[param]
+        expected = credentials_params[param]
         if isinstance(actual, SecretStr):
             actual = actual.get_secret_value()
         assert actual == expected
 
-    valid_params = dir(SnowflakeCredentials)
-    for param in valid_params:
-        if param.startswith("_"):
-            continue
 
-        expected = getattr(snowflake_credentials, param)
-        if callable(expected):
-            continue
-
-        if expected is None:
-            # it is filtered out
-            assert param not in snowflake_credentials.connect_params
-        else:
-            # the value is correct
-            assert snowflake_credentials.connect_params[param] == expected
+def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    with pytest.raises(ValueError, match="One of the authentication keys"):
+        SnowflakeCredentials(**credentials_params_missing)
 
 
-def test_snowflake_credentials_get_connection_override(
-    snowflake_auth, connection_params
-):
-    connection = SnowflakeCredentials(**connection_params).get_connection(
-        database="override_database", warehouse="override_warehouse"
-    )
+def test_snowflake_credentials_validate_token_kwargs(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "oauth"
+    with pytest.raises(ValueError, match="If authenticator is set to `oauth`"):
+        SnowflakeCredentials(**credentials_params_missing)
 
-    for param in connection_params:
-        if param == "password":
-            continue
-        expected = connection_params[param]
-        if param in ["database", "warehouse"]:
-            expected = f"override_{expected}"
-        assert getattr(connection, param) == expected
+    # now test if passing both works
+    credentials_params_missing["token"] = "some_token"
+    assert SnowflakeCredentials(**credentials_params_missing)
 
 
-def test_snowflake_credentials_get_connection_missing_auth(
-    snowflake_auth, connection_params
-):
-    connection_params_missing = connection_params.copy()
-    connection_params_missing.pop("password")
-    with pytest.raises(ValueError, match="One of the authentication methods"):
-        SnowflakeCredentials(**connection_params_missing).get_connection()
+def test_snowflake_credentials_validate_okta_endpoint_kwargs(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "okta_endpoint"
+    with pytest.raises(ValueError, match="If authenticator is set to `okta_endpoint`"):
+        SnowflakeCredentials(**credentials_params_missing)
 
-
-@pytest.mark.parametrize("param", ("database", "warehouse"))
-def test_snowflake_credentials_get_connection_missing_input(
-    snowflake_auth, connection_params, param
-):
-    connection_params_missing = connection_params.copy()
-    connection_params_missing.pop(param)
-    with pytest.raises(ValueError, match=f"The {param} must be set in either"):
-        SnowflakeCredentials(**connection_params_missing).get_connection()
-
-
-def test_snowflake_password_is_secret_str():
-    password = "dontshowthis"
-    credentials = SnowflakeCredentials(
-        account="name_of_account", user="user", password=password
-    )
-    connect_params_password = credentials.connect_params["password"]
-    assert isinstance(connect_params_password, SecretStr)
-    assert connect_params_password.get_secret_value() == password
+    # now test if passing both works
+    credentials_params_missing["okta_endpoint"] = "https://account_name.okta.com"
+    assert SnowflakeCredentials(**credentials_params_missing)
