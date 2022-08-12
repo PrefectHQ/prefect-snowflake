@@ -116,6 +116,6 @@ class SnowflakeCredentials(Block):
         if authenticator == "okta_endpoint" and not okta_endpoint:
             raise ValueError(
                 "If authenticator is set to `okta_endpoint`, "
-                "`okta_endpoint` must be provided\n"
+                "`okta_endpoint` must be provided"
             )
         return values
