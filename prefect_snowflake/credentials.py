@@ -1,6 +1,11 @@
 """Credentials class to authenticate Snowflake."""
 
-from typing import Literal, Optional
+from typing import Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from prefect.blocks.core import Block
 from pydantic import Field, SecretBytes, SecretStr, root_validator
