@@ -102,7 +102,7 @@ class SnowflakeCredentials(Block):
         token = values.get("token")
         if authenticator == "oauth" and not token:
             raise ValueError(
-                "If authenticator is set to `oauth`, `token` must be provided\n"
+                "If authenticator is set to `oauth`, `token` must be provided"
             )
         return values
 
