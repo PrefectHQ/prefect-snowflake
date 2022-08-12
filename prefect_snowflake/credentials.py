@@ -1,6 +1,6 @@
 """Credentials class to authenticate Snowflake."""
 
-from typing import Optional
+from typing import Literal, Optional
 
 from prefect.blocks.core import Block
 from pydantic import Field, SecretBytes, SecretStr, root_validator
@@ -22,6 +22,8 @@ class SnowflakeCredentials(Block):
             work in an environment where a browser is available.
         token (SecretStr): The OAuth or JWT Token to provide when
             authenticator is set to OAuth.
+        okta_endpoint (str): The Okta endpoint to use when authenticator is
+            set to `okta_endpoint`, e.g. `https://<okta_account_name>.okta.com`.
         role (str): The name of the default role to use.
         autocommit (bool): Whether to automatically commit.
 
@@ -44,17 +46,26 @@ class SnowflakeCredentials(Block):
     private_key: Optional[SecretBytes] = Field(
         default=None, description="The PEM used to authenticate"
     )
-    authenticator: Optional[str] = Field(
-        default=None,
-        description=(
-            "The type of authenticator to use for initializing "
-            "connection (oauth, externalbrowser, etc)"
-        ),
+    authenticator: Literal[
+        "snowflake",
+        "externalbrowser",
+        "okta_endpoint",
+        "oauth",
+        "username_password_mfa",
+    ] = Field(  # noqa
+        default="snowflake",
+        description=("The type of authenticator to use for initializing connection"),
     )
     token: Optional[SecretStr] = Field(
         default=None,
         description=(
-            "The OAuth or JWT Token to provide when " "authenticator is set to oauth"
+            "The OAuth or JWT Token to provide when authenticator is set to `oauth`"
+        ),
+    )
+    endpoint: Optional[str] = Field(
+        default=None,
+        description=(
+            "The Okta endpoint to use when authenticator is set to `okta_endpoint`"
         ),
     )
     role: Optional[str] = Field(
@@ -74,5 +85,32 @@ class SnowflakeCredentials(Block):
             auth_str = ", ".join(auth_params)
             raise ValueError(
                 f"One of the authentication keys must be provided: {auth_str}\n"
+            )
+        return values
+
+    @root_validator(pre=True)
+    def _validate_token_kwargs(cls, values):
+        """
+        Ensure an authorization value has been provided by the user.
+        """
+        authenticator = values.get("authenticator")
+        token = values.get("token")
+        if authenticator == "oauth" and not token:
+            raise ValueError(
+                "If authenticator is set to `oauth`, `token` must be provided\n"
+            )
+        return values
+
+    @root_validator(pre=True)
+    def _validate_okta_kwargs(cls, values):
+        """
+        Ensure an authorization value has been provided by the user.
+        """
+        authenticator = values.get("authenticator")
+        okta_endpoint = values.get("okta_endpoint")
+        if authenticator == "okta_endpoint" and not okta_endpoint:
+            raise ValueError(
+                "If authenticator is set to `okta_endpoint`, "
+                "`okta_endpoint` must be provided\n"
             )
         return values

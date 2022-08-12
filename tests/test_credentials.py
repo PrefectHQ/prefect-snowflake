@@ -29,3 +29,27 @@ def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
     credentials_params_missing.pop("password")
     with pytest.raises(ValueError, match="One of the authentication keys"):
         SnowflakeCredentials(**credentials_params_missing)
+
+
+def test_snowflake_credentials_validate_token_kwargs(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "oauth"
+    with pytest.raises(ValueError, match="If authenticator is set to `oauth`"):
+        SnowflakeCredentials(**credentials_params_missing)
+
+    # now test if passing both works
+    credentials_params_missing["token"] = "some_token"
+    assert SnowflakeCredentials(**credentials_params_missing)
+
+
+def test_snowflake_credentials_validate_okta_endpoint_kwargs(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "okta_endpoint"
+    with pytest.raises(ValueError, match="If authenticator is set to `okta_endpoint`"):
+        SnowflakeCredentials(**credentials_params_missing)
+
+    # now test if passing both works
+    credentials_params_missing["okta_endpoint"] = "https://account_name.okta.com"
+    assert SnowflakeCredentials(**credentials_params_missing)
