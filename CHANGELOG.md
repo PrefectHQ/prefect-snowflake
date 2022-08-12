@@ -8,16 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `SnowflakeConnector` block - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- `okta_endpoint` field to `SnowflakeCredentials` - [#25](https://github.com/PrefectHQ/prefect-snowflake/pull/25)
 
 ### Changed
+- Moved the keywords, `database` and `warehouse`, from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- Moved the method `get_connection` from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- `authenticator` field in `SnowflakeCredentials` to `Literal` type - [#25](https://github.com/PrefectHQ/prefect-snowflake/pull/25)
 
 ### Deprecated
 
 ### Removed
+- Removed the keywords, `database` and `warehouse`, from `snowflake_query` and `snowflake_multiquery` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 
 ### Fixed
 
 ### Security
+- Fixed revealing the input password nested under `connect_params` when logging `SnowflakeCredentials` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+
+## 0.2.0
+Released on August ??th, 2022.
 
 ## 0.1.4
 
