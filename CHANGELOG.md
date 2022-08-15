@@ -22,12 +22,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.2.0
 Released on August 15th, 2022.
 
+Note, with this release, fields from `SnowflakeCredentials` are migrated to `SnowflakeConnector`:
+```
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector
+...
+snowflake_credentials = SnowflakeCredentials(
+    account="account",
+    user="user",
+    password="password",
+)
+snowflake_connector = SnowflakeConnector(
+    database="database",
+    warehouse="warehouse",
+    schema="schema",
+    credentials=snowflake_credentials
+)
+```
+
+Tasks now accept `SnowflakeConnector` instead of `SnowflakeCredentials`:
+```
+snowflake_query(..., snowflake_connector)
+```
+
 ### Added
 - `SnowflakeConnector` block - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 - `okta_endpoint` field to `SnowflakeCredentials` - [#25](https://github.com/PrefectHQ/prefect-snowflake/pull/25)
 
 ### Changed
-- Moved the keywords, `database` and `warehouse`, from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
+- Moved the keywords, `database`, `warehouse`, and `schema` from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 - Moved the method `get_connection` from `credentials.SnowflakeCredentials` into `database.SnowflakeConnector` - [#24](https://github.com/PrefectHQ/prefect-snowflake/pull/24)
 - `authenticator` field in `SnowflakeCredentials` to `Literal` type - [#25](https://github.com/PrefectHQ/prefect-snowflake/pull/25)
 
