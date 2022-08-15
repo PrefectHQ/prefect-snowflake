@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.2.0
 Released on August 15th, 2022.
 
-Note, with this release, fields from `SnowflakeCredentials` are migrated to `SnowflakeConnector`:
+Note, with this release, the `database`, `warehouse` and `schema` fields from `SnowflakeCredentials` have been migrated to `SnowflakeConnector`:
 ```
 from prefect_snowflake.credentials import SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector
