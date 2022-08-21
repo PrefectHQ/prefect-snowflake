@@ -29,7 +29,7 @@ class SnowflakeConnector(Block):
     Example:
         Load stored Snowflake connector:
         ```python
-        from prefect_snowflake import SnowflakeConnector
+        from prefect_snowflake.database import SnowflakeConnector
         snowflake_connector_block = SnowflakeConnector.load("BLOCK_NAME")
         ```
     """  # noqa
