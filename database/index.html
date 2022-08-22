@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://prefecthq.github.io/prefect-snowflake/database/">
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.0">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.1">
     
     
       
@@ -492,7 +492,7 @@
 <details class="example">
   <summary>Example</summary>
   <p>Load stored Snowflake connector:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 <span class="n">snowflake_connector_block</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 </details>
@@ -605,7 +605,7 @@
 <span class="sd">    Example:</span>
 <span class="sd">        Load stored Snowflake connector:</span>
 <span class="sd">        ```python</span>
-<span class="sd">        from prefect_snowflake import SnowflakeConnector</span>
+<span class="sd">        from prefect_snowflake.database import SnowflakeConnector</span>
 <span class="sd">        snowflake_connector_block = SnowflakeConnector.load(&quot;BLOCK_NAME&quot;)</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
@@ -935,6 +935,17 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
                 <code>False</code>
           </td>
         </tr>
+        <tr>
+          <td><code>poll_frequency_seconds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>Number of seconds to wait in between checks for
+run completion.</p></td>
+          <td>
+                <code>1</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
@@ -989,10 +1000,7 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>prefect_snowflake/database.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
@@ -1068,7 +1076,13 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
 <span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
-<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">snowflake_multiquery</span><span class="p">(</span>
     <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">snowflake_connector</span><span class="p">:</span> <span class="n">SnowflakeConnector</span><span class="p">,</span>
@@ -1076,6 +1090,7 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
     <span class="n">cursor_type</span><span class="p">:</span> <span class="n">SnowflakeCursor</span> <span class="o">=</span> <span class="n">SnowflakeCursor</span><span class="p">,</span>
     <span class="n">as_transaction</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">return_transaction_control_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">poll_frequency_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes multiple queries against a Snowflake database in a shared session.</span>
@@ -1089,6 +1104,8 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
 <span class="sd">        as_transaction: If True, queries are executed in a transaction.</span>
 <span class="sd">        return_transaction_control_results: Determines if the results of queries</span>
 <span class="sd">            controlling the transaction (BEGIN/COMMIT) should be returned.</span>
+<span class="sd">        poll_frequency_seconds: Number of seconds to wait in between checks for</span>
+<span class="sd">            run completion.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        List of the outputs of `response.fetchall()` for each query.</span>
@@ -1138,7 +1155,7 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
                 <span class="k">while</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_still_running</span><span class="p">(</span>
                     <span class="n">connection</span><span class="o">.</span><span class="n">get_query_status_throw_if_error</span><span class="p">(</span><span class="n">query_id</span><span class="p">)</span>
                 <span class="p">):</span>
-                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_frequency_seconds</span><span class="p">)</span>
                 <span class="n">cursor</span><span class="o">.</span><span class="n">get_results_from_sfqid</span><span class="p">(</span><span class="n">query_id</span><span class="p">)</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -1221,6 +1238,17 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
           <td><p>The type of database cursor to use for the query.</p></td>
           <td>
                 <code>SnowflakeCursor</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>poll_frequency_seconds</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>Number of seconds to wait in between checks for
+run completion.</p></td>
+          <td>
+                <code>1</code>
           </td>
         </tr>
     </tbody>
@@ -1337,12 +1365,16 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">snowflake_query</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">snowflake_connector</span><span class="p">:</span> <span class="n">SnowflakeConnector</span><span class="p">,</span>
     <span class="n">params</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cursor_type</span><span class="p">:</span> <span class="n">SnowflakeCursor</span> <span class="o">=</span> <span class="n">SnowflakeCursor</span><span class="p">,</span>
+    <span class="n">poll_frequency_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes a query against a Snowflake database.</span>
@@ -1352,6 +1384,8 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
 <span class="sd">        params: The params to replace the placeholders in the query.</span>
 <span class="sd">        snowflake_connector: The credentials to use to authenticate.</span>
 <span class="sd">        cursor_type: The type of database cursor to use for the query.</span>
+<span class="sd">        poll_frequency_seconds: Number of seconds to wait in between checks for</span>
+<span class="sd">            run completion.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The output of `response.fetchall()`.</span>
@@ -1395,7 +1429,7 @@ controlling the transaction (BEGIN/COMMIT) should be returned.</p></td>
             <span class="k">while</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_still_running</span><span class="p">(</span>
                 <span class="n">connection</span><span class="o">.</span><span class="n">get_query_status_throw_if_error</span><span class="p">(</span><span class="n">query_id</span><span class="p">)</span>
             <span class="p">):</span>
-                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_frequency_seconds</span><span class="p">)</span>
             <span class="n">cursor</span><span class="o">.</span><span class="n">get_results_from_sfqid</span><span class="p">(</span><span class="n">query_id</span><span class="p">)</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">result</span>
