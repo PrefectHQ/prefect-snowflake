@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `poll_frequency_seconds` to `snowflake_query` and `snowflake_multiquery`.
+Number of seconds to wait in between checks for run completion.
 
 ### Changed
 
