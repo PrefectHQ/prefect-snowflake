@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `poll_frequency_seconds` to `snowflake_query` and `snowflake_multiquery` [#29](https://github.com/PrefectHQ/prefect-snowflake/pull/29).
 
 ### Changed
 
