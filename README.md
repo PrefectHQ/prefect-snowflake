@@ -64,20 +64,21 @@ from snowflake.connector.pandas_tools import write_pandas
 
 @flow
 def snowflake_write_pandas_flow():
-    snowflake_auth = SnowflakeConnector.load("my-block")
-
-    with snowflake_auth.get_connection() as conn:
-        statement = "CREATE TABLE IF NOT EXISTS %{table_name_param}s (%{ddl_param}s)"
-        params = {"table_name_param": "table_name", "ddl_param": "NAME STRING, NUMBER INT"}
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    with snowflake_connector.get_connection() as conn:
+        table_name = "TABLE_NAME"
+        ddl = "NAME STRING, NUMBER INT"
+        statement = f'CREATE TABLE IF NOT EXISTS {table_name} ({ddl})'
         with conn.cursor() as cur:
-            cur.execute(statement, params=params)
+            cur.execute(statement)
 
-        df = pd.DataFrame([('Marvin', 42), ('Ford', 88)], columns=['name', 'number'])
+        # case sensitivity matters here!
+        df = pd.DataFrame([('Marvin', 42), ('Ford', 88)], columns=['NAME', 'NUMBER'])
         success, num_chunks, num_rows, _ = write_pandas(
             conn=conn, df=df,
-            table_name=target_table,
-            database=snowflake_auth.database,
-            schema=snowflake_auth.schema_
+            table_name=table_name,
+            database=snowflake_connector.database,
+            schema=snowflake_connector.schema_  # note the "_" suffix
         )
 ```
 
