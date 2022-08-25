@@ -22,7 +22,7 @@ Install `prefect-snowflake` with `pip`:
 pip install prefect-snowflake
 ```
 
-### Write and run a flow
+### Query from table
 
 ```python
 from prefect import flow
@@ -51,6 +51,36 @@ def snowflake_query_flow():
     return result
 
 snowflake_query_flow()
+```
+
+### Write pandas to table using block attributes
+
+```python
+import pandas as pd
+from prefect import flow
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query
+from snowflake.connector.pandas_tools import write_pandas
+
+@flow
+def snowflake_write_pandas_flow():
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    with snowflake_connector.get_connection() as conn:
+        table_name = "TABLE_NAME"
+        ddl = "NAME STRING, NUMBER INT"
+        statement = f'CREATE TABLE IF NOT EXISTS {table_name} ({ddl})'
+        with conn.cursor() as cur:
+            cur.execute(statement)
+
+        # case sensitivity matters here!
+        df = pd.DataFrame([('Marvin', 42), ('Ford', 88)], columns=['NAME', 'NUMBER'])
+        success, num_chunks, num_rows, _ = write_pandas(
+            conn=conn,
+            df=df,
+            table_name=table_name,
+            database=snowflake_connector.database,
+            schema=snowflake_connector.schema_  # note the "_" suffix
+        )
 ```
 
 ## Resources

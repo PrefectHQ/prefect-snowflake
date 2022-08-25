@@ -23,7 +23,8 @@ class SnowflakeConnector(Block):
     Args:
         database (str): The name of the default database to use.
         warehouse (str): The name of the default warehouse to use.
-        schema (str): The name of the default schema to use.
+        schema (str): The name of the default schema to use;
+            this attribute is accessible through `SnowflakeConnector(...).schema_`.
         credentials (SnowflakeCredentials): The credentials to authenticate with Snowflake.
 
     Example:
