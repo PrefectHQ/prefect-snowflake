@@ -75,7 +75,8 @@ def snowflake_write_pandas_flow():
         # case sensitivity matters here!
         df = pd.DataFrame([('Marvin', 42), ('Ford', 88)], columns=['NAME', 'NUMBER'])
         success, num_chunks, num_rows, _ = write_pandas(
-            conn=conn, df=df,
+            conn=conn,
+            df=df,
             table_name=table_name,
             database=snowflake_connector.database,
             schema=snowflake_connector.schema_  # note the "_" suffix
