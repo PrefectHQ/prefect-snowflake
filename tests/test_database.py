@@ -74,7 +74,6 @@ class SnowflakeCursor:
         return self
 
 
-
 class SnowflakeConnection:
     def __enter__(self):
         return self
@@ -173,17 +172,14 @@ def test_snowflake_multiquery_transaction_with_transaction_control_results(
 
 
 def test_snowflake_query_sync(snowflake_connector):
-    @flow
-    def test_flow():
+    @flow()
+    def test_snowflake_query_sync_flow():
         result = snowflake_query(
-            "query",
-            snowflake_connector,
-            params=("param",),
-            execute_async=False
+            "query", snowflake_connector, params=("param",), execute_async=False
         )
         return result
 
-    result = test_flow()
+    result = test_snowflake_query_sync_flow()
     assert result[0][0] == "query"
     assert result[0][1] == ("param",)
     assert result[0][2] == "async"
