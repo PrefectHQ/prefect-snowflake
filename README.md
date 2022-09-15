@@ -83,30 +83,28 @@ def snowflake_write_pandas_flow():
         )
 ```
 
-### Execute put into Snowflake stage
+### Execute get/put into Snowflake stage
 
 Snowflake get/put command don't seem to work when executed as an async (Snowflake async as opposed to Python async) job.
 
-By default all queries submitted via the snowflake_query task are async.
+For get/put operations use the 
 
 ```python
 import pandas as pd
 from prefect import flow
 from prefect_snowflake.credentials import SnowflakeCredentials
-from prefect_snowflake.database import SnowflakeConnector, snowflake_query
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query_sync
 
 @flow
 def snowflake_put_file_to_snowflake_stage():
     snowflake_connector = SnowflakeConnector.load("my-block")
-    with snowflake_connector.get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "put file:///somedir/somefile.csv @mystage",
-                execute_async=False
-            )
+    
+    snowflake_query_sync(
+        f"put file:///myfolder/myfile @mystage/mystagepath",
+        snowflake_connector=snowflake_connector
+    )
             
 ```
-
 
 ## Resources
 
