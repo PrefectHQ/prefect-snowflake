@@ -46,7 +46,7 @@ prefect block register -m prefect_snowflake.credentials
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
-### Write and run a flow
+### Query from table
 
 ```python
 from prefect import flow
@@ -75,6 +75,55 @@ def snowflake_query_flow():
     return result
 
 snowflake_query_flow()
+```
+
+### Write pandas to table using block attributes
+
+```python
+import pandas as pd
+from prefect import flow
+from prefect_snowflake.credentials import SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query
+from snowflake.connector.pandas_tools import write_pandas
+
+@flow
+def snowflake_write_pandas_flow():
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    with snowflake_connector.get_connection() as conn:
+        table_name = "TABLE_NAME"
+        ddl = "NAME STRING, NUMBER INT"
+        statement = f'CREATE TABLE IF NOT EXISTS {table_name} ({ddl})'
+        with conn.cursor() as cur:
+            cur.execute(statement)
+
+        # case sensitivity matters here!
+        df = pd.DataFrame([('Marvin', 42), ('Ford', 88)], columns=['NAME', 'NUMBER'])
+        success, num_chunks, num_rows, _ = write_pandas(
+            conn=conn,
+            df=df,
+            table_name=table_name,
+            database=snowflake_connector.database,
+            schema=snowflake_connector.schema_  # note the "_" suffix
+        )
+```
+
+### Execute `get` and `put` statements
+
+To execute `get` and `put` statements, use `snowflake_query_sync`.
+
+```python
+from prefect import flow
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query_sync
+
+@flow
+def snowflake_put_file_to_snowflake_stage():
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    
+    snowflake_query_sync(
+        f"put file:///myfolder/myfile @mystage/mystagepath",
+        snowflake_connector=snowflake_connector
+    )
+            
 ```
 
 ## Resources

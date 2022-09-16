@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-
 ### Changed
 
 ### Deprecated
@@ -18,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.2.1
+
+Released on August 22nd, 2022.
+
+### Added
+- `poll_frequency_seconds` to `snowflake_query` and `snowflake_multiquery` [#29](https://github.com/PrefectHQ/prefect-snowflake/pull/29).
 
 ## 0.2.0
 Released on August 15th, 2022.

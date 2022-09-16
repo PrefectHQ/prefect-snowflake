@@ -23,13 +23,14 @@ class SnowflakeConnector(Block):
     Args:
         database (str): The name of the default database to use.
         warehouse (str): The name of the default warehouse to use.
-        schema (str): The name of the default schema to use.
+        schema (str): The name of the default schema to use;
+            this attribute is accessible through `SnowflakeConnector(...).schema_`.
         credentials (SnowflakeCredentials): The credentials to authenticate with Snowflake.
 
     Example:
         Load stored Snowflake connector:
         ```python
-        from prefect_snowflake import SnowflakeConnector
+        from prefect_snowflake.database import SnowflakeConnector
         snowflake_connector_block = SnowflakeConnector.load("BLOCK_NAME")
         ```
     """  # noqa
@@ -116,6 +117,7 @@ async def snowflake_query(
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
     cursor_type: SnowflakeCursor = SnowflakeCursor,
+    poll_frequency_seconds: int = 1,
 ) -> List[Tuple[Any]]:
     """
     Executes a query against a Snowflake database.
@@ -125,6 +127,8 @@ async def snowflake_query(
         params: The params to replace the placeholders in the query.
         snowflake_connector: The credentials to use to authenticate.
         cursor_type: The type of database cursor to use for the query.
+        poll_frequency_seconds: Number of seconds to wait in between checks for
+            run completion.
 
     Returns:
         The output of `response.fetchall()`.
@@ -168,7 +172,7 @@ async def snowflake_query(
             while connection.is_still_running(
                 connection.get_query_status_throw_if_error(query_id)
             ):
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(poll_frequency_seconds)
             cursor.get_results_from_sfqid(query_id)
             result = cursor.fetchall()
     return result
@@ -182,6 +186,7 @@ async def snowflake_multiquery(
     cursor_type: SnowflakeCursor = SnowflakeCursor,
     as_transaction: bool = False,
     return_transaction_control_results: bool = False,
+    poll_frequency_seconds: int = 1,
 ) -> List[List[Tuple[Any]]]:
     """
     Executes multiple queries against a Snowflake database in a shared session.
@@ -195,6 +200,8 @@ async def snowflake_multiquery(
         as_transaction: If True, queries are executed in a transaction.
         return_transaction_control_results: Determines if the results of queries
             controlling the transaction (BEGIN/COMMIT) should be returned.
+        poll_frequency_seconds: Number of seconds to wait in between checks for
+            run completion.
 
     Returns:
         List of the outputs of `response.fetchall()` for each query.
@@ -244,7 +251,7 @@ async def snowflake_multiquery(
                 while connection.is_still_running(
                     connection.get_query_status_throw_if_error(query_id)
                 ):
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(poll_frequency_seconds)
                 cursor.get_results_from_sfqid(query_id)
                 result = cursor.fetchall()
                 results.append(result)
@@ -254,3 +261,60 @@ async def snowflake_multiquery(
         return results[1:-1]
     else:
         return results
+
+
+@task
+async def snowflake_query_sync(
+    query: str,
+    snowflake_connector: SnowflakeConnector,
+    params: Union[Tuple[Any], Dict[str, Any]] = None,
+    cursor_type: SnowflakeCursor = SnowflakeCursor,
+) -> List[Tuple[Any]]:
+    """
+    Executes a query in sync mode against a Snowflake database.
+
+    Args:
+        query: The query to execute against the database.
+        params: The params to replace the placeholders in the query.
+        snowflake_connector: The credentials to use to authenticate.
+        cursor_type: The type of database cursor to use for the query.
+
+    Returns:
+        The output of `response.fetchall()`.
+
+    Examples:
+        Execute a put statement.
+        ```python
+        from prefect import flow
+        from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.database import SnowflakeConnector, snowflake_query
+
+
+        @flow
+        def snowflake_query_sync_flow():
+            snowflake_credentials = SnowflakeCredentials(
+                account="account",
+                user="user",
+                password="password",
+            )
+            snowflake_connector = SnowflakeConnector(
+                database="database",
+                warehouse="warehouse",
+                schema="schema",
+                credentials=snowflake_credentials
+            )
+            result = snowflake_query_sync(
+                "put file://afile.csv @mystage;",
+                snowflake_connector,
+            )
+            return result
+
+        snowflake_query_sync_flow()
+        ```
+    """
+    # context manager automatically rolls back failed transactions and closes
+    with snowflake_connector.get_connection() as connection:
+        with connection.cursor(cursor_type) as cursor:
+            cursor.execute(query, params=params)
+            result = cursor.fetchall()
+    return result
