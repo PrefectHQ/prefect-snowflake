@@ -291,7 +291,7 @@ async def snowflake_query_sync(
 
 
         @flow
-        def snowflake_query_flow():
+        def snowflake_query_sync_flow():
             snowflake_credentials = SnowflakeCredentials(
                 account="account",
                 user="user",
