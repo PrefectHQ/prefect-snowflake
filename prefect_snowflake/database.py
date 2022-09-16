@@ -309,7 +309,7 @@ async def snowflake_query_sync(
             )
             return result
 
-        snowflake_query_flow()
+        snowflake_query_sync_flow()
         ```
     """
     # context manager automatically rolls back failed transactions and closes
