@@ -1,5 +1,21 @@
 # prefect-snowflake
 
+<p align="center">
+    <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
+    <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
+        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+    <a href="https://pepy.tech/badge/prefect-snowflake/" alt="Downloads">
+        <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+    <a href="https://github.com/PrefectHQ/prefect-snowflake/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+    <br>
+    <a href="https://prefect-snowflake-community.slack.com" alt="Slack">
+        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
+    <a href="https://discourse.prefect-snowflake.io/" alt="Discourse">
+        <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
+</p>
+
 ## Welcome!
 
 Prefect integrations for interacting with prefect-snowflake.
@@ -21,6 +37,14 @@ Install `prefect-snowflake` with `pip`:
 ```bash
 pip install prefect-snowflake
 ```
+
+Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
+
+```bash
+prefect block register -m prefect_snowflake.credentials
+```
+
+Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
 ### Write and run a flow
 
@@ -58,6 +82,8 @@ snowflake_query_flow()
 If you encounter any bugs while using `prefect-snowflake`, feel free to open an issue in the [prefect-snowflake](https://github.com/PrefectHQ/prefect-snowflake) repository.
 
 If you have any questions or issues while using `prefect-snowflake`, you can find help in either the [Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
+
+Feel free to ⭐️ or watch [`prefect-snowflake`](https://github.com/PrefectHQ/prefect-snowflake) for updates too!
 
 ## Development
 
