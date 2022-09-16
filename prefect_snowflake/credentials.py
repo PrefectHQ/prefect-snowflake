@@ -133,7 +133,7 @@ def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[s
 
     def _disassemble_cert(cert: str) -> str:  # pragma: no cover
         """
-        Parse the certificate into components
+        Parse the certificate into components.
         """
         import re
 
