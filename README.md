@@ -83,6 +83,25 @@ def snowflake_write_pandas_flow():
         )
 ```
 
+### Execute `get` and `put` statements
+
+To execute `get` and `put` statements, use `snowflake_query_sync`.
+
+```python
+from prefect import flow
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query_sync
+
+@flow
+def snowflake_put_file_to_snowflake_stage():
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    
+    snowflake_query_sync(
+        f"put file:///myfolder/myfile @mystage/mystagepath",
+        snowflake_connector=snowflake_connector
+    )
+            
+```
+
 ## Resources
 
 If you encounter any bugs while using `prefect-snowflake`, feel free to open an issue in the [prefect-snowflake](https://github.com/PrefectHQ/prefect-snowflake) repository.
