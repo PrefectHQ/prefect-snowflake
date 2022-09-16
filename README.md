@@ -89,7 +89,6 @@ To execute `get` and `put` statements, use `snowflake_query_sync`.
 
 ```python
 from prefect import flow
-from prefect_snowflake.credentials import SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector, snowflake_query_sync
 
 @flow
