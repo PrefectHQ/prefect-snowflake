@@ -85,9 +85,7 @@ def snowflake_write_pandas_flow():
 
 ### Execute get/put into Snowflake stage
 
-Snowflake get/put command don't seem to work when executed as an async (Snowflake async as opposed to Python async) job.
-
-For get/put operations use the 
+To execute `get` and `put` statements, use `snowflake_query_sync`.
 
 ```python
 import pandas as pd
