@@ -83,7 +83,7 @@ def snowflake_write_pandas_flow():
         )
 ```
 
-### Execute get/put into Snowflake stage
+### Execute `get` and `put` statements
 
 To execute `get` and `put` statements, use `snowflake_query_sync`.
 
