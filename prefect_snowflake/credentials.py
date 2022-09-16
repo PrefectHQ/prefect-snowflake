@@ -131,7 +131,7 @@ def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[s
     # the cert body back into a certificate that
     # passes validation in the serialization stage.
 
-    def _disassemble_cert(cert: str):  # pragma: no cover
+    def _disassemble_cert(cert: str) -> str:  # pragma: no cover
         """
         Parse the certificate into components
         """
