@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from prefect import flow
-from pydantic import SecretStr
+from pydantic import SecretBytes, SecretStr
 
 from prefect_snowflake.database import (
     BEGIN_TRANSACTION_STATEMENT,
@@ -165,3 +165,16 @@ def test_snowflake_multiquery_transaction_with_transaction_control_results(
     assert result[2][0][0] == "query2"
     assert result[2][0][1] == ("param",)
     assert result[3][0][0] == END_TRANSACTION_STATEMENT
+
+
+def test_snowflake_private_connector_init(private_connector_params):
+    snowflake_connector = SnowflakeConnector(**private_connector_params)
+    actual_connector_params = snowflake_connector.dict()
+    for param in private_connector_params:
+        expected = private_connector_params[param]
+        if param == "schema":
+            param = "schema_"
+        actual = actual_connector_params[param]
+        if isinstance(actual, (SecretStr, SecretBytes)):
+            actual = actual.get_secret_value()
+        assert actual == expected

@@ -1,6 +1,6 @@
 """Credentials class to authenticate Snowflake."""
 
-from typing import Optional
+from typing import Optional, Union
 
 try:
     from typing import Literal
@@ -119,3 +119,49 @@ class SnowflakeCredentials(Block):
                 "`okta_endpoint` must be provided"
             )
         return values
+
+
+def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[str]):
+    """
+    Converts a PEM certificate into a DER binary key
+    """
+    # The original key passed from prefect has the last few lines of the cert
+    # concatenated. This query splits the certificate into head+body+footer,
+    # then splits the body on any whitespace. Finally the reassemble_cert turns
+    # the cert body back into a certificate that
+    # passes validation in the serialization stage.
+
+    def _disassemble_cert(cert: str):  # pragma: no cover
+        """
+        Parse the certificate into components
+        """
+        import re
+
+        cert_parts = re.match(r"(-+[^-]+-+)([^-]+)(-+[^-]+-+)", cert)
+        yield cert_parts[1]
+        for p in re.split(r"\s+", cert_parts[2]):
+            if p:
+                yield p
+        yield cert_parts[3]
+
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import serialization
+
+    if isinstance(private_key, bytes):
+        private_key = private_key.decode()
+
+    if isinstance(password, str) and len(password) > 0:
+        password = password.encode()
+
+    if not isinstance(password, bytes) or len(password) == 0 or password.isspace():
+        password = None
+
+    return serialization.load_pem_private_key(
+        ("\n".join(_disassemble_cert(private_key))).encode(),
+        password=password,
+        backend=default_backend(),
+    ).private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
