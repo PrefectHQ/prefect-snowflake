@@ -306,7 +306,6 @@ async def snowflake_query_sync(
             result = snowflake_query_sync(
                 "put file://afile.csv @mystage;",
                 snowflake_connector,
-                params={"id_param": 1}
             )
             return result
 
