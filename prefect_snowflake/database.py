@@ -283,7 +283,7 @@ async def snowflake_query_sync(
         The output of `response.fetchall()`.
 
     Examples:
-        Query Snowflake table with the ID value parameterized.
+        Execute a put statement.
         ```python
         from prefect import flow
         from prefect_snowflake.credentials import SnowflakeCredentials
