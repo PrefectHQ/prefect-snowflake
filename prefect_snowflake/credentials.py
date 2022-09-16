@@ -1,6 +1,10 @@
 """Credentials class to authenticate Snowflake."""
 
+import re
 from typing import Optional, Union
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 try:
     from typing import Literal
@@ -8,7 +12,21 @@ except ImportError:
     from typing_extensions import Literal
 
 from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr, root_validator
+from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
+
+# PEM certificates have the pattern:
+#   -----BEGIN PRIVATE KEY-----
+#   <- multiple lines of encoded data->
+#   -----END PRIVATE KEY-----
+#
+# The regex capture the header and footer into groups 1 and 3, the body into group 2
+# group 1: "header" captures series of hyphens followed by anything that is
+#           not a hyphen followed by another string of hyphens
+# group 2: "body" capture everything upto the next hyphen
+# group 3: "footer" duplicates group 1
+_SIMPLE_PEM_CERTIFICATE_REGEX = "^(-+[^-]+-+)([^-]+)(-+[^-]+-+)"
+
+_INVALID_PEM_FORMAT_CERTIFICATE = "Invalid PEM Format Certificate"
 
 
 class SnowflakeCredentials(Block):
@@ -120,32 +138,55 @@ class SnowflakeCredentials(Block):
             )
         return values
 
+    @validator("private_key", pre=True)
+    def _validate_private_key(cls, private_key):
+        """
+        Ensure a private_key looks like a PEM format certificate.
+        """
+        if private_key is None:
+            return None
 
-def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[str]):
+        pk = (
+            private_key.get_secret_value()
+            if isinstance(private_key, (SecretBytes, SecretStr))
+            else private_key
+        )
+        pk = pk.decode() if isinstance(pk, bytes) else pk
+
+        if not isinstance(pk, str):
+            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
+
+        if pk.isspace() or len(pk) == 0:
+            return None
+
+        cert_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, pk)
+        if cert_parts is None:
+            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
+
+        return private_key
+
+
+def _resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[str]):
     """
     Converts a PEM certificate into a DER binary key
     """
     # The original key passed from prefect has the last few lines of the cert
     # concatenated. This query splits the certificate into head+body+footer,
-    # then splits the body on any whitespace. Finally the reassemble_cert turns
-    # the cert body back into a certificate that
-    # passes validation in the serialization stage.
+    # then splits the body on any whitespace, finally the reassemble_cert turns
+    # the cert body back into a certificate that passes validation
+    # in the serialization stage.
 
-    def _disassemble_cert(cert: str) -> str:  # pragma: no cover
+    def _rebuild_private_key(private_key: str) -> str:  # pragma: no cover
         """
-        Parse the certificate into components.
+        Disassemble the certificate and rebuild it.
         """
-        import re
-
-        cert_parts = re.match(r"(-+[^-]+-+)([^-]+)(-+[^-]+-+)", cert)
-        yield cert_parts[1]
-        for p in re.split(r"\s+", cert_parts[2]):
-            if p:
-                yield p
-        yield cert_parts[3]
-
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import serialization
+        cert_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key)
+        if cert_parts is None:
+            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
+        # split each string in the body separated by whitespace
+        body = "\n".join(re.split(r"\s+", cert_parts[2].strip()))
+        # reassemble header+body+footer
+        return f"{cert_parts[1]}\n{body}\n{cert_parts[3]}"
 
     if isinstance(private_key, bytes):
         private_key = private_key.decode()
@@ -157,7 +198,7 @@ def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[s
         password = None
 
     return serialization.load_pem_private_key(
-        ("\n".join(_disassemble_cert(private_key))).encode(),
+        data=_rebuild_private_key(private_key).encode(),
         password=password,
         backend=default_backend(),
     ).private_bytes(

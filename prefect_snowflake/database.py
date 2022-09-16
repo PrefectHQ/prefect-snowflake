@@ -71,16 +71,14 @@ class SnowflakeConnector(Block):
         if connect_params.get("authenticator") == "okta_endpoint":
             connect_params["authenticator"] = connect_params.pop("okta_endpoint")
 
-        pk = connect_params.get("private_key")
+        private_key = connect_params.get("private_key")
 
-        if pk is not None:
-            pk = pk.decode() if isinstance(pk, bytes) else pk
-            if pk.startswith("----"):
-                from prefect_snowflake.credentials import resolve_pem_certificate
+        if private_key is not None:
+            from prefect_snowflake.credentials import _resolve_pem_certificate
 
-                connect_params["private_key"] = resolve_pem_certificate(
-                    pk, connect_params.get("password")
-                )
+            connect_params["private_key"] = _resolve_pem_certificate(
+                private_key, connect_params.get("password")
+            )
 
         return connect_params
 

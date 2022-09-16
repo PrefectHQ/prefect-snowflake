@@ -3,7 +3,11 @@ from unittest.mock import MagicMock
 import pytest
 from pydantic import SecretBytes, SecretStr
 
-from prefect_snowflake.credentials import SnowflakeCredentials, resolve_pem_certificate
+from prefect_snowflake.credentials import (
+    _INVALID_PEM_FORMAT_CERTIFICATE,
+    SnowflakeCredentials,
+    _resolve_pem_certificate,
+)
 
 
 @pytest.fixture
@@ -74,13 +78,12 @@ def test_snowflake_credentials_validate_private_key_password(
     private_key = credentials_params_missing.pop("private_key")
     assert password == "letmein"
     assert isinstance(private_key, bytes)
-    assert private_key.startswith(b"----")
     # Test cert as string
-    assert resolve_pem_certificate(private_key.decode(), password)
-    # Test password as byte string
-    assert resolve_pem_certificate(private_key.decode(), password.encode())
+    assert _resolve_pem_certificate(private_key, password)
+    # Test cert as string
+    # assert resolve_pem_certificate(private_key.decode(), password)
     # Test cert as bytes
-    assert resolve_pem_certificate(private_key, password.encode())
+    # assert resolve_pem_certificate(private_key, password.encode())
 
 
 def test_snowflake_credentials_validate_private_key_invalid(private_credentials_params):
@@ -89,7 +92,7 @@ def test_snowflake_credentials_validate_private_key_invalid(private_credentials_
     assert isinstance(private_key, bytes)
     assert private_key.startswith(b"----")
     with pytest.raises(ValueError, match="Bad decrypt. Incorrect password?"):
-        resolve_pem_certificate(private_key.decode(), "_incorrect_password_")
+        _resolve_pem_certificate(private_key.decode(), "_incorrect_password_")
 
 
 def test_snowflake_credentials_validate_private_key_unexpected_password(
@@ -102,7 +105,7 @@ def test_snowflake_credentials_validate_private_key_unexpected_password(
     with pytest.raises(
         TypeError, match="Password was not given but private key is encrypted"
     ):
-        resolve_pem_certificate(private_key.decode(), None)
+        _resolve_pem_certificate(private_key.decode(), None)
 
 
 def test_snowflake_credentials_validate_private_key_no_pass_password(
@@ -118,10 +121,26 @@ def test_snowflake_credentials_validate_private_key_no_pass_password(
     with pytest.raises(
         TypeError, match="Password was given but private key is not encrypted"
     ):
-        assert resolve_pem_certificate(private_key.decode(), password)
+        assert _resolve_pem_certificate(private_key.decode(), password)
 
-    assert resolve_pem_certificate(private_key.decode(), None)
-    assert resolve_pem_certificate(private_key.decode(), "")
-    assert resolve_pem_certificate(private_key.decode(), "  ")
-    assert resolve_pem_certificate(private_key.decode(), b"")
-    assert resolve_pem_certificate(private_key.decode(), b"  ")
+    assert _resolve_pem_certificate(private_key.decode(), None)
+    assert _resolve_pem_certificate(private_key.decode(), "")
+    assert _resolve_pem_certificate(private_key.decode(), "  ")
+    assert _resolve_pem_certificate(private_key.decode(), b"")
+    assert _resolve_pem_certificate(private_key.decode(), b"  ")
+
+
+def test_snowflake_credentials_validate_private_key_is_pem(
+    private_no_pass_credentials_params,
+):
+    private_no_pass_credentials_params["private_key"] = "_invalid_key_"
+    with pytest.raises(ValueError, match=_INVALID_PEM_FORMAT_CERTIFICATE):
+        SnowflakeCredentials(**private_no_pass_credentials_params)
+
+
+def test_snowflake_credentials_validate_private_key_is_pem_bytes(
+    private_no_pass_credentials_params,
+):
+    private_no_pass_credentials_params["private_key"] = b"_invalid_key_"
+    with pytest.raises(ValueError, match=_INVALID_PEM_FORMAT_CERTIFICATE):
+        SnowflakeCredentials(**private_no_pass_credentials_params)
