@@ -1,10 +1,6 @@
 """Credentials class to authenticate Snowflake."""
 
-import re
 from typing import Optional, Union
-
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
 
 try:
     from typing import Literal
@@ -12,23 +8,7 @@ except ImportError:
     from typing_extensions import Literal
 
 from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
-
-# PEM certificates have the pattern:
-#   -----BEGIN PRIVATE KEY-----
-#   <- multiple lines of encoded data->
-#   -----END PRIVATE KEY-----
-#
-# The regex capture the header and footer into groups 1 and 3, the body into group 2
-# group 1: "header" captures series of hyphens followed by anything that is
-#           not a hyphen followed by another string of hyphens
-# group 2: "body" capture everything upto the next hyphen
-# group 3: "footer" duplicates group 1
-_SIMPLE_PEM_CERTIFICATE_REGEX = "^(-+[^-]+-+)([^-]+)(-+[^-]+-+)"
-
-
-class InvalidPemFormat(Exception):
-    """Invalid PEM Format Certificate"""
+from pydantic import Field, SecretBytes, SecretStr, root_validator
 
 
 class SnowflakeCredentials(Block):
@@ -140,90 +120,48 @@ class SnowflakeCredentials(Block):
             )
         return values
 
-    @validator("private_key")
-    def _validate_private_key(cls, private_key):
-        """
-        Ensure a private_key looks like a PEM format certificate.
-        """
 
-        if private_key is None:
-            return None
-
-        assert isinstance(private_key, SecretBytes)
-
-        pk = _decode_secret(private_key)
-
-        return None if pk is None else SecretBytes(_compose_pem(pk))
-
-    def resolve_private_key(self) -> Optional[bytes]:
-        """
-        Converts a PEM encoded private key into a DER binary key
-
-        Returns:
-            bytes: DER binary key if private_key has been provided
-                    otherwise returns None
-
-        Raises:
-            InvalidPemFormat: if `private_key` is not in PEM format
-        """
-
-        private_key = _decode_secret(self.private_key)
-
-        if private_key is None:
-            return None
-
-        return serialization.load_pem_private_key(
-            data=private_key,
-            password=_decode_secret(self.password),
-            backend=default_backend(),
-        ).private_bytes(
-            encoding=serialization.Encoding.DER,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-
-
-def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
+def resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[str]):
     """
-    Decode the provided secret into bytes. If the secret is not a
-    string or bytes, or it is whitespace, then return None.
-
-    Args:
-        secret: The value to decode.
-
-    Returns:
-        The decoded secret as bytes.
-
+    Converts a PEM certificate into a DER binary key
     """
-    if isinstance(secret, (SecretBytes, SecretStr)):
-        secret = secret.get_secret_value()
+    # The original key passed from prefect has the last few lines of the cert
+    # concatenated. This query splits the certificate into head+body+footer,
+    # then splits the body on any whitespace. Finally the reassemble_cert turns
+    # the cert body back into a certificate that
+    # passes validation in the serialization stage.
 
-    if not isinstance(secret, (bytes, str)) or len(secret) == 0 or secret.isspace():
-        return None
+    def _disassemble_cert(cert: str):  # pragma: no cover
+        """
+        Parse the certificate into components
+        """
+        import re
 
-    return secret if isinstance(secret, bytes) else secret.encode()
+        cert_parts = re.match(r"(-+[^-]+-+)([^-]+)(-+[^-]+-+)", cert)
+        yield cert_parts[1]
+        for p in re.split(r"\s+", cert_parts[2]):
+            if p:
+                yield p
+        yield cert_parts[3]
 
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import serialization
 
-def _compose_pem(private_key: bytes) -> bytes:
-    """Validate structure of PEM certificate.
+    if isinstance(private_key, bytes):
+        private_key = private_key.decode()
 
-    The original key passed from Prefect is sometimes malformed.
-    This function recomposes the key into a valid key that will
-    pass the serialization step when resolving the key to a DER.
+    if isinstance(password, str) and len(password) > 0:
+        password = password.encode()
 
-    Args:
-        private_key (str): A valid PEM format string
+    if not isinstance(password, bytes) or len(password) == 0 or password.isspace():
+        password = None
 
-    Returns:
-        tuple: Tuple containing header, body and footer of the PEM certificate
-
-    Raises:
-        InvalidPemFormat: if `private_key` is an invalid format
-    """
-    pem_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key.decode())
-    if pem_parts is None:
-        raise InvalidPemFormat()
-
-    body = "\n".join(re.split(r"\s+", pem_parts[2].strip()))
-    # reassemble header+body+footer
-    return f"{pem_parts[1]}\n{body}\n{pem_parts[3]}".encode()
+    return serialization.load_pem_private_key(
+        ("\n".join(_disassemble_cert(private_key))).encode(),
+        password=password,
+        backend=default_backend(),
+    ).private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
