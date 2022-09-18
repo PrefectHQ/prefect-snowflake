@@ -138,7 +138,7 @@ class SnowflakeCredentials(Block):
             )
         return values
 
-    @validator("private_key", pre=True)
+    @validator("private_key")
     def _validate_private_key(cls, private_key):
         """
         Ensure a private_key looks like a PEM format certificate.
@@ -146,11 +146,9 @@ class SnowflakeCredentials(Block):
         if private_key is None:
             return None
 
-        pk = (
-            private_key.get_secret_value()
-            if isinstance(private_key, (SecretBytes, SecretStr))
-            else private_key
-        )
+        assert isinstance(private_key, (SecretBytes, SecretStr))
+
+        pk = private_key.get_secret_value()
         pk = pk.decode() if isinstance(pk, bytes) else pk
 
         if not isinstance(pk, str):
