@@ -10,6 +10,7 @@ from prefect_snowflake.database import (
     SnowflakeConnector,
     snowflake_multiquery,
     snowflake_query,
+    snowflake_query_sync,
 )
 
 
@@ -68,6 +69,10 @@ class SnowflakeCursor:
 
     def fetchall(self):
         return self.query_result
+
+    def execute(self, query, params=None):
+        self.query_result = [(query, params, "sync")]
+        return self
 
 
 class SnowflakeConnection:
@@ -165,6 +170,18 @@ def test_snowflake_multiquery_transaction_with_transaction_control_results(
     assert result[2][0][0] == "query2"
     assert result[2][0][1] == ("param",)
     assert result[3][0][0] == END_TRANSACTION_STATEMENT
+
+
+def test_snowflake_query_sync(snowflake_connector):
+    @flow()
+    def test_snowflake_query_sync_flow():
+        result = snowflake_query_sync("query", snowflake_connector, params=("param",))
+        return result
+
+    result = test_snowflake_query_sync_flow()
+    assert result[0][0] == "query"
+    assert result[0][1] == ("param",)
+    assert result[0][2] == "sync"
 
 
 def test_snowflake_private_connector_init(private_connector_params):

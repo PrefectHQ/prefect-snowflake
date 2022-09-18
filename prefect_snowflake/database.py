@@ -270,3 +270,60 @@ async def snowflake_multiquery(
         return results[1:-1]
     else:
         return results
+
+
+@task
+async def snowflake_query_sync(
+    query: str,
+    snowflake_connector: SnowflakeConnector,
+    params: Union[Tuple[Any], Dict[str, Any]] = None,
+    cursor_type: SnowflakeCursor = SnowflakeCursor,
+) -> List[Tuple[Any]]:
+    """
+    Executes a query in sync mode against a Snowflake database.
+
+    Args:
+        query: The query to execute against the database.
+        params: The params to replace the placeholders in the query.
+        snowflake_connector: The credentials to use to authenticate.
+        cursor_type: The type of database cursor to use for the query.
+
+    Returns:
+        The output of `response.fetchall()`.
+
+    Examples:
+        Execute a put statement.
+        ```python
+        from prefect import flow
+        from prefect_snowflake.credentials import SnowflakeCredentials
+        from prefect_snowflake.database import SnowflakeConnector, snowflake_query
+
+
+        @flow
+        def snowflake_query_sync_flow():
+            snowflake_credentials = SnowflakeCredentials(
+                account="account",
+                user="user",
+                password="password",
+            )
+            snowflake_connector = SnowflakeConnector(
+                database="database",
+                warehouse="warehouse",
+                schema="schema",
+                credentials=snowflake_credentials
+            )
+            result = snowflake_query_sync(
+                "put file://afile.csv @mystage;",
+                snowflake_connector,
+            )
+            return result
+
+        snowflake_query_sync_flow()
+        ```
+    """
+    # context manager automatically rolls back failed transactions and closes
+    with snowflake_connector.get_connection() as connection:
+        with connection.cursor(cursor_type) as cursor:
+            cursor.execute(query, params=params)
+            result = cursor.fetchall()
+    return result
