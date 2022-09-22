@@ -26,7 +26,9 @@ from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
 # group 3: "footer" duplicates group 1
 _SIMPLE_PEM_CERTIFICATE_REGEX = "^(-+[^-]+-+)([^-]+)(-+[^-]+-+)"
 
-_INVALID_PEM_FORMAT_CERTIFICATE = "Invalid PEM Format Certificate"
+
+class InvalidPemFormat(Exception):
+    """Invalid PEM Format Certificate"""
 
 
 class SnowflakeCredentials(Block):
@@ -143,64 +145,85 @@ class SnowflakeCredentials(Block):
         """
         Ensure a private_key looks like a PEM format certificate.
         """
+
         if private_key is None:
             return None
 
-        assert isinstance(private_key, (SecretBytes, SecretStr))
+        assert isinstance(private_key, SecretBytes)
 
-        pk = private_key.get_secret_value()
-        pk = pk.decode() if isinstance(pk, bytes) else pk
+        pk = _decode_secret(private_key)
 
-        if not isinstance(pk, str):
-            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
+        return None if pk is None else SecretBytes(_compose_pem(pk))
 
-        if pk.isspace() or len(pk) == 0:
+    def resolve_private_key(self) -> Optional[bytes]:
+        """
+        Converts a PEM encoded private key into a DER binary key
+
+        Returns:
+            bytes: DER binary key if private_key has been provided
+                    otherwise returns None
+
+        Raises:
+            InvalidPemFormat: if `private_key` is not in PEM format
+        """
+
+        private_key = _decode_secret(self.private_key)
+
+        if private_key is None:
             return None
 
-        cert_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, pk)
-        if cert_parts is None:
-            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
+        return serialization.load_pem_private_key(
+            data=private_key,
+            password=_decode_secret(self.password),
+            backend=default_backend(),
+        ).private_bytes(
+            encoding=serialization.Encoding.DER,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
 
-        return private_key
 
-
-def _resolve_pem_certificate(private_key: Union[str, bytes], password: Optional[str]):
+def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
     """
-    Converts a PEM certificate into a DER binary key
+    Decode the provided secret into bytes. If the secret is not a
+    string or bytes, or it is whitespace, then return None
+
+    Args:
+        secret: The value to decode
+
+    Returns:
+        bytes or None
+
     """
-    # The original key passed from prefect has the last few lines of the cert
-    # concatenated. This query splits the certificate into head+body+footer,
-    # then splits the body on any whitespace, finally the reassemble_cert turns
-    # the cert body back into a certificate that passes validation
-    # in the serialization stage.
+    if isinstance(secret, (SecretBytes, SecretStr)):
+        secret = secret.get_secret_value()
 
-    def _rebuild_private_key(private_key: str) -> str:  # pragma: no cover
-        """
-        Disassemble the certificate and rebuild it.
-        """
-        cert_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key)
-        if cert_parts is None:
-            raise ValueError(_INVALID_PEM_FORMAT_CERTIFICATE)
-        # split each string in the body separated by whitespace
-        body = "\n".join(re.split(r"\s+", cert_parts[2].strip()))
-        # reassemble header+body+footer
-        return f"{cert_parts[1]}\n{body}\n{cert_parts[3]}"
+    if not isinstance(secret, (bytes, str)) or len(secret) == 0 or secret.isspace():
+        return None
 
-    if isinstance(private_key, bytes):
-        private_key = private_key.decode()
+    return secret if isinstance(secret, bytes) else secret.encode()
 
-    if isinstance(password, str) and len(password) > 0:
-        password = password.encode()
 
-    if not isinstance(password, bytes) or len(password) == 0 or password.isspace():
-        password = None
+def _compose_pem(private_key: bytes) -> bytes:
+    """Validate structure of PEM certificate.
 
-    return serialization.load_pem_private_key(
-        data=_rebuild_private_key(private_key).encode(),
-        password=password,
-        backend=default_backend(),
-    ).private_bytes(
-        encoding=serialization.Encoding.DER,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
+    The original key passed from Prefect is sometimes malformed.
+    This function recomposes the key into a valid key that will
+    pass the serialization step when resolving the key to a DER.
+
+    Args:
+        private_key (str): A valid PEM format string
+
+    Returns:
+        tuple: Tuple containing header, body and footer of the PEM certificate
+
+    Raises:
+        InvalidPemFormat: if `private_key` is an invalid format
+    """
+    pem_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key.decode())
+    if pem_parts is None:
+        raise InvalidPemFormat()
+
+    body = "\n".join(re.split(r"\s+", pem_parts[2].strip()))
+    # reassemble header+body+footer
+    return f"{pem_parts[1]}\n{body}\n{pem_parts[3]}".encode()

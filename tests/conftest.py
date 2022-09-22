@@ -76,3 +76,19 @@ def private_no_pass_connector_params(private_no_pass_credentials_params):
         "credentials": snowflake_credentials,
     }
     return _connector_params
+
+
+@pytest.fixture()
+def private_malformed_credentials_params():
+    import os
+
+    cert_path = os.path.join(
+        os.path.split(__file__)[0], "test_cert_malformed_format.p8"
+    )
+    with open(cert_path, "rb") as fd:
+        return {
+            "account": "account",
+            "user": "user",
+            "password": "letmein",
+            "private_key": fd.read(),
+        }
