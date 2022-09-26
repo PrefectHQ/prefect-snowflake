@@ -29,7 +29,7 @@ setup(
     extras_require={"dev": dev_requires},
     entry_points={
         "prefect.collections": [
-            "SnowflakeCredentials = prefect_snowflake.credentials",
+            "prefect_snowflake = prefect_snowflake",
         ]
     },
     classifiers=[
