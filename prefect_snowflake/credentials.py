@@ -189,7 +189,7 @@ def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
     string or bytes, or it is whitespace, then return None.
 
     Args:
-        secret: The value to decode
+        secret: The value to decode.
 
     Returns:
         bytes or None
