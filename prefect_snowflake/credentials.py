@@ -186,7 +186,7 @@ class SnowflakeCredentials(Block):
 def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
     """
     Decode the provided secret into bytes. If the secret is not a
-    string or bytes, or it is whitespace, then return None
+    string or bytes, or it is whitespace, then return None.
 
     Args:
         secret: The value to decode
