@@ -192,7 +192,7 @@ def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
         secret: The value to decode.
 
     Returns:
-        bytes or None
+        The decoded secret as bytes.
 
     """
     if isinstance(secret, (SecretBytes, SecretStr)):
