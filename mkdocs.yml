@@ -1,7 +1,7 @@
 site_name: prefect-snowflake
-site_url: https://prefecthq.github.io/prefect-snowflake
+site_url: https://PrefectHQ.github.io/prefect-snowflake
 repo_url: https://github.com/prefecthq/prefect-snowflake
-edit_uri: /edit/main/docs/
+edit_uri: edit/main/docs/
 theme:
   name: material
   favicon: img/favicon.ico
@@ -10,7 +10,8 @@ theme:
     accent: blue
   icon:
     repo: fontawesome/brands/github
-  logo: img/prefect-logo-white.png
+  logo:
+    img/prefect-logo-white.png
   font:
     text: Inter
     code: Source Code Pro
