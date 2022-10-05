@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.2
+
+Released on October 5th, 2022.
+
+### Added
+- `snowflake_query_sync` [#34](https://github.com/PrefectHQ/prefect-snowflake/pull/34).
+
 ## 0.2.1
 
 Released on August 22nd, 2022.
