@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://prefecthq.github.io/prefect-snowflake/</loc>
-         <lastmod>2022-08-22</lastmod>
+         <loc>https://PrefectHQ.github.io/prefect-snowflake/</loc>
+         <lastmod>2022-10-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://prefecthq.github.io/prefect-snowflake/credentials/</loc>
-         <lastmod>2022-08-22</lastmod>
+         <loc>https://PrefectHQ.github.io/prefect-snowflake/credentials/</loc>
+         <lastmod>2022-10-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://prefecthq.github.io/prefect-snowflake/database/</loc>
-         <lastmod>2022-08-22</lastmod>
+         <loc>https://PrefectHQ.github.io/prefect-snowflake/database/</loc>
+         <lastmod>2022-10-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
