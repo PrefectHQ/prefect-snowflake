@@ -217,7 +217,7 @@ class SnowflakeCredentials(Block):
         pass the serialization step when resolving the key to a DER.
 
         Args:
-            private_key (str): A valid PEM format string
+            private_key: A valid PEM format string.
 
         Returns:
             Binary encoded certificate
