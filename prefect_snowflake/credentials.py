@@ -166,7 +166,7 @@ class SnowflakeCredentials(Block):
 
         Returns:
             DER binary key if private_key has been provided
-                    otherwise returns None
+                otherwise returns None.
 
         Raises:
             InvalidPemFormat: if `private_key` is not in PEM format
