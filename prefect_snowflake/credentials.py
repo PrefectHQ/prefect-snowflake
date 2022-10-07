@@ -24,7 +24,7 @@ from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
 #   <- multiple lines of encoded data->
 #   -----END PRIVATE KEY-----
 #
-# The regex capture the header and footer into groups 1 and 3, the body into group 2
+# The regex captures the header and footer into groups 1 and 3, the body into group 2
 # group 1: "header" captures series of hyphens followed by anything that is
 #           not a hyphen followed by another string of hyphens
 # group 2: "body" capture everything upto the next hyphen
@@ -162,14 +162,13 @@ class SnowflakeCredentials(Block):
 
     def resolve_private_key(self) -> Optional[bytes]:
         """
-        Converts a PEM encoded private key into a DER binary key
+        Converts a PEM encoded private key into a DER binary key.
 
         Returns:
-            DER binary key if private_key has been provided
-                otherwise returns None.
+            DER encoded key if private_key has been provided otherwise returns None.
 
         Raises:
-            InvalidPemFormat: if `private_key` is not in PEM format
+            InvalidPemFormat: If private key is not in PEM format.
         """
 
         private_key = self._decode_secret(self.private_key)
@@ -217,13 +216,13 @@ class SnowflakeCredentials(Block):
         pass the serialization step when resolving the key to a DER.
 
         Args:
-            private_key: A valid PEM format string.
+            private_key: A valid PEM format byte encoded string.
 
         Returns:
-            Binary encoded certificate
+            byte encoded certificate.
 
         Raises:
-            InvalidPemFormat: if `private_key` is an invalid format
+            InvalidPemFormat: if private key is an invalid format.
         """
         pem_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key.decode())
         if pem_parts is None:
