@@ -8,7 +8,7 @@ from prefect_snowflake.credentials import SnowflakeCredentials
 def _read_test_file(name: str) -> bytes:
     """
     Args:
-        name: file to load from test_data folder.
+        name: File to load from test_data folder.
 
     Returns:
         File content as binary.
