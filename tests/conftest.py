@@ -11,7 +11,7 @@ def _read_test_file(name: str) -> bytes:
         name: file to load from test_data folder.
 
     Returns:
-        File content as binary
+        File content as binary.
     """
     full_name = os.path.join(os.path.split(__file__)[0], "test_data", name)
     with open(full_name, "rb") as fd:
