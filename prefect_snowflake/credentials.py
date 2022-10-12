@@ -1,6 +1,15 @@
 """Credentials class to authenticate Snowflake."""
 
-from typing import Optional
+import re
+from typing import Optional, Union
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    NoEncryption,
+    PrivateFormat,
+    load_pem_private_key,
+)
 
 try:
     from typing import Literal
@@ -8,7 +17,23 @@ except ImportError:
     from typing_extensions import Literal
 
 from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr, root_validator
+from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
+
+# PEM certificates have the pattern:
+#   -----BEGIN PRIVATE KEY-----
+#   <- multiple lines of encoded data->
+#   -----END PRIVATE KEY-----
+#
+# The regex captures the header and footer into groups 1 and 3, the body into group 2
+# group 1: "header" captures series of hyphens followed by anything that is
+#           not a hyphen followed by another string of hyphens
+# group 2: "body" capture everything upto the next hyphen
+# group 3: "footer" duplicates group 1
+_SIMPLE_PEM_CERTIFICATE_REGEX = "^(-+[^-]+-+)([^-]+)(-+[^-]+-+)"
+
+
+class InvalidPemFormat(Exception):
+    """Invalid PEM Format Certificate"""
 
 
 class SnowflakeCredentials(Block):
@@ -119,3 +144,90 @@ class SnowflakeCredentials(Block):
                 "`okta_endpoint` must be provided"
             )
         return values
+
+    @validator("private_key")
+    def _validate_private_key(cls, private_key):
+        """
+        Ensure a private_key looks like a PEM format certificate.
+        """
+
+        if private_key is None:
+            return None
+
+        assert isinstance(private_key, SecretBytes)
+
+        pk = cls._decode_secret(private_key)
+
+        return None if pk is None else SecretBytes(cls._compose_pem(pk))
+
+    def resolve_private_key(self) -> Optional[bytes]:
+        """
+        Converts a PEM encoded private key into a DER binary key.
+
+        Returns:
+            DER encoded key if private_key has been provided otherwise returns None.
+
+        Raises:
+            InvalidPemFormat: If private key is not in PEM format.
+        """
+
+        private_key = self._decode_secret(self.private_key)
+
+        if private_key is None:
+            return None
+
+        return load_pem_private_key(
+            data=private_key,
+            password=self._decode_secret(self.password),
+            backend=default_backend(),
+        ).private_bytes(
+            encoding=Encoding.DER,
+            format=PrivateFormat.PKCS8,
+            encryption_algorithm=NoEncryption(),
+        )
+
+    @staticmethod
+    def _decode_secret(secret: Union[SecretStr, SecretBytes]) -> Optional[bytes]:
+        """
+        Decode the provided secret into bytes. If the secret is not a
+        string or bytes, or it is whitespace, then return None.
+
+        Args:
+            secret: The value to decode.
+
+        Returns:
+            The decoded secret as bytes.
+
+        """
+        if isinstance(secret, (SecretBytes, SecretStr)):
+            secret = secret.get_secret_value()
+
+        if not isinstance(secret, (bytes, str)) or len(secret) == 0 or secret.isspace():
+            return None
+
+        return secret if isinstance(secret, bytes) else secret.encode()
+
+    @staticmethod
+    def _compose_pem(private_key: bytes) -> bytes:
+        """Validate structure of PEM certificate.
+
+        The original key passed from Prefect is sometimes malformed.
+        This function recomposes the key into a valid key that will
+        pass the serialization step when resolving the key to a DER.
+
+        Args:
+            private_key: A valid PEM format byte encoded string.
+
+        Returns:
+            byte encoded certificate.
+
+        Raises:
+            InvalidPemFormat: if private key is an invalid format.
+        """
+        pem_parts = re.match(_SIMPLE_PEM_CERTIFICATE_REGEX, private_key.decode())
+        if pem_parts is None:
+            raise InvalidPemFormat()
+
+        body = "\n".join(re.split(r"\s+", pem_parts[2].strip()))
+        # reassemble header+body+footer
+        return f"{pem_parts[1]}\n{body}\n{pem_parts[3]}".encode()
