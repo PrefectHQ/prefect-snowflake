@@ -71,6 +71,11 @@ class SnowflakeConnector(Block):
         if connect_params.get("authenticator") == "okta_endpoint":
             connect_params["authenticator"] = connect_params.pop("okta_endpoint")
 
+        private_der_key = self.credentials.resolve_private_key()
+        if private_der_key is not None:
+            connect_params["private_key"] = private_der_key
+            connect_params.pop("password", None)
+
         return connect_params
 
     def get_connection(self) -> snowflake.connector.SnowflakeConnection:
