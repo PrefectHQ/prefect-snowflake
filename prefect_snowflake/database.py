@@ -1,11 +1,13 @@
 """Module for querying against Snowflake database."""
 
 import asyncio
-from typing import Any, Dict, List, Tuple, Union
+from contextlib import asynccontextmanager
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import snowflake.connector
 from prefect import task
-from prefect.blocks.core import Block
+from prefect.blocks.abstract import DatabaseBlock
+from prefect.utilities.asyncutils import sync_compatible
 from pydantic import Field
 from snowflake.connector.cursor import SnowflakeCursor
 
@@ -15,7 +17,7 @@ BEGIN_TRANSACTION_STATEMENT = "BEGIN TRANSACTION"
 END_TRANSACTION_STATEMENT = "COMMIT"
 
 
-class SnowflakeConnector(Block):
+class SnowflakeConnector(DatabaseBlock):
 
     """
     Block used to manage connections with Snowflake.
@@ -78,7 +80,9 @@ class SnowflakeConnector(Block):
 
         return connect_params
 
-    def get_connection(self) -> snowflake.connector.SnowflakeConnection:
+    def get_connection(
+        self, autocommit: bool = True
+    ) -> snowflake.connector.SnowflakeConnection:
         """
         Returns an authenticated connection that can be
         used to query from Snowflake databases.
@@ -106,14 +110,173 @@ class SnowflakeConnector(Block):
                     schema="schema",
                     credentials=snowflake_credentials
                 )
-                print(snowflake_connector.get_connection())
+                with snowflake_connector.get_connection() as connection:
+                    print(connection)
 
             get_connection_flow()
             ```
         """
         connect_params = self._get_connect_params()
+        connect_params["autocommit"] = autocommit
         connection = snowflake.connector.connect(**connect_params)
         return connection
+
+    @asynccontextmanager
+    async def _async_execute_operation(
+        self,
+        operation: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        interval_seconds: int = 1,
+        **execute_kwargs: Dict[str, Any],
+    ) -> Generator[SnowflakeCursor, None, None]:
+        """
+        Helper method to get a cursor from the connection.
+        """
+        with self.get_connection() as connection:
+            with connection.cursor(cursor_type) as cursor:
+                response = cursor.execute_async(
+                    operation, params=parameters, **execute_kwargs
+                )
+                query_id = response["queryId"]
+                while connection.is_still_running(
+                    connection.get_query_status_throw_if_error(query_id)
+                ):
+                    await asyncio.sleep(interval_seconds)
+                cursor.get_results_from_sfqid(query_id)
+                yield cursor
+
+    @sync_compatible
+    async def fetch_one(
+        self,
+        operation: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        interval_seconds: int = 1,
+        **execute_kwargs: Dict[str, Any],
+    ) -> Tuple[Any]:
+        """
+        Fetch a single result from the database.
+
+        Args:
+            operation: The SQL query or other operation to be executed.
+            parameters: The parameters for the operation.
+            cursor_type: The type of cursor to use.
+            interval_seconds: The number of seconds to wait
+                between polling the database.
+            **execute_kwargs: Additional keyword arguments
+                to pass to `cursor.execute_async`.
+
+        Returns:
+            A list of tuples containing the data returned by the database,
+                where each row is a tuple and each column is a value in the tuple.
+        """
+        execute_kwargs = dict(
+            operation=operation,
+            parameters=parameters,
+            cursor_type=cursor_type,
+            interval_seconds=interval_seconds,
+            **execute_kwargs,
+        )
+        async with self._async_execute_operation(**execute_kwargs) as cursor:
+            result = cursor.fetchone()
+        return result
+
+    @sync_compatible
+    async def fetch_many(
+        self,
+        operation: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        limit: Optional[int] = 5,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        interval_seconds: int = 1,
+        **execute_kwargs: Dict[str, Any],
+    ) -> List[Tuple[Any]]:
+        """
+        Fetch a limited number of results from the database.
+
+        Args:
+            operation: The SQL query or other operation to be executed.
+            parameters: The parameters for the operation.
+            limit: The number of results to return.
+            cursor_type: The type of cursor to use.
+            interval_seconds: The number of seconds to wait
+                between polling the database.
+            **execute_kwargs: Additional keyword arguments
+                to pass to `cursor.execute_async`.
+
+        Returns:
+            A list of tuples containing the data returned by the database,
+                where each row is a tuple and each column is a value in the tuple.
+        """
+        execute_kwargs = dict(
+            operation=operation,
+            parameters=parameters,
+            cursor_type=cursor_type,
+            interval_seconds=interval_seconds,
+            **execute_kwargs,
+        )
+        async with self._async_execute_operation(**execute_kwargs) as cursor:
+            result = cursor.fetchmany(size=limit)
+        return result
+
+    @sync_compatible
+    async def fetch_all(
+        self,
+        operation: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        interval_seconds: int = 1,
+        **execute_kwargs: Dict[str, Any],
+    ) -> List[Tuple[Any]]:
+        """
+        Fetch all results from the database.
+
+        Args:
+            operation: The SQL query or other operation to be executed.
+            parameters: The parameters for the operation.
+            cursor_type: The type of cursor to use.
+            interval_seconds: The number of seconds to wait
+                between polling the database.
+            **execute_kwargs: Additional keyword arguments
+                to pass to `cursor.execute_async`.
+
+        Returns:
+            A list of tuples containing the data returned by the database,
+                where each row is a tuple and each column is a value in the tuple.
+        """
+        execute_kwargs = dict(
+            operation=operation,
+            parameters=parameters,
+            cursor_type=cursor_type,
+            interval_seconds=interval_seconds,
+            **execute_kwargs,
+        )
+        async with self._async_execute_operation(**execute_kwargs) as cursor:
+            result = cursor.fetchall()
+        return result
+
+    @sync_compatible
+    async def execute(
+        self,
+        operation: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        **execute_kwargs: Dict[str, Any],
+    ) -> None:
+        """
+        Executes an operation on the database. This method is intended to be used
+        for operations that do not return data, such as INSERT, UPDATE, or DELETE.
+
+        Args:
+            operation: The SQL query or other operation to be executed.
+            parameters: The parameters for the operation.
+            cursor_type: The type of cursor to use.
+            **execute_kwargs: Additional keyword arguments to pass to `cursor.execute`.
+        """
+        with self.get_connection() as connection:
+            with connection.cursor(cursor_type) as cursor:
+                cursor.execute(operation, params=parameters, **execute_kwargs)
 
 
 @task
