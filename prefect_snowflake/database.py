@@ -28,6 +28,10 @@ class SnowflakeConnector(DatabaseBlock):
         schema (str): The name of the default schema to use;
             this attribute is accessible through `SnowflakeConnector(...).schema_`.
         credentials (SnowflakeCredentials): The credentials to authenticate with Snowflake.
+        fetch_size: The number of rows to fetch at a time when calling fetch_many.
+            Note, this parameter is executed on the client side and is not
+            passed to the database. To limit on the server side, add the `LIMIT`
+            clause, or the dialect's equivalent clause, like `TOP`, to the query.
 
     Example:
         Load stored Snowflake connector:
@@ -46,6 +50,9 @@ class SnowflakeConnector(DatabaseBlock):
         alias="schema", description="The name of the default schema to use"
     )
     credentials: SnowflakeCredentials
+    fetch_size: int = Field(
+        default=1, description="The number of rows to fetch at a time."
+    )
 
     def _get_connect_params(self) -> Dict[str, str]:
         """
@@ -187,7 +194,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        limit: Optional[int] = 5,
+        size: Optional[int] = None,
         cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
         interval_seconds: int = 1,
         **execute_kwargs: Dict[str, Any],
@@ -198,7 +205,8 @@ class SnowflakeConnector(DatabaseBlock):
         Args:
             operation: The SQL query or other operation to be executed.
             parameters: The parameters for the operation.
-            limit: The number of results to return.
+            size: The number of results to return; if None or 0, uses the value of
+                `fetch_size` configured on the block.
             cursor_type: The type of cursor to use.
             interval_seconds: The number of seconds to wait
                 between polling the database.
@@ -217,7 +225,8 @@ class SnowflakeConnector(DatabaseBlock):
             **execute_kwargs,
         )
         async with self._async_execute_operation(**execute_kwargs) as cursor:
-            result = cursor.fetchmany(size=limit)
+            size = size or self.fetch_size
+            result = cursor.fetchmany(size=size)
         return result
 
     @sync_compatible
@@ -256,8 +265,7 @@ class SnowflakeConnector(DatabaseBlock):
             result = cursor.fetchall()
         return result
 
-    @sync_compatible
-    async def execute(
+    def execute(
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
@@ -265,8 +273,9 @@ class SnowflakeConnector(DatabaseBlock):
         **execute_kwargs: Dict[str, Any],
     ) -> None:
         """
-        Executes an operation on the database. This method is intended to be used
-        for operations that do not return data, such as INSERT, UPDATE, or DELETE.
+        Executes an operation on the database, synchronously.
+        This method is intended to be used for operations that do not return data,
+        such as INSERT, UPDATE, or DELETE.
 
         Args:
             operation: The SQL query or other operation to be executed.
@@ -277,6 +286,30 @@ class SnowflakeConnector(DatabaseBlock):
         with self.get_connection() as connection:
             with connection.cursor(cursor_type) as cursor:
                 cursor.execute(operation, params=parameters, **execute_kwargs)
+
+    def execute_many(
+        self,
+        operation: str,
+        seq_of_parameters: List[Dict[str, Any]],
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        **execute_kwargs: Dict[str, Any],
+    ) -> None:
+        """
+        Executes many operations on the database, synchronously.
+        This method is intended to be used for operations that do not return data,
+        such as INSERT, UPDATE, or DELETE.
+
+        Args:
+            operation: The SQL query or other operation to be executed.
+            seq_of_parameters: The sequence of parameters for the operation.
+            cursor_type: The type of cursor to use.
+            **execute_kwargs: Additional keyword arguments to pass to `cursor.execute`.
+        """
+        with self.get_connection() as connection:
+            with connection.cursor(cursor_type) as cursor:
+                cursor.executemany(
+                    operation, params=seq_of_parameters, **execute_kwargs
+                )
 
 
 @task
