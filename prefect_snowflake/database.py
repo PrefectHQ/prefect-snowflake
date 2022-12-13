@@ -7,7 +7,7 @@ from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 import snowflake.connector
 from prefect import task
 from prefect.blocks.abstract import DatabaseBlock
-from prefect.utilities.asyncutils import sync_compatible
+from prefect.utilities.asyncutils import run_sync_in_worker_thread, sync_compatible
 from pydantic import Field
 from snowflake.connector.cursor import SnowflakeCursor
 
@@ -53,6 +53,8 @@ class SnowflakeConnector(DatabaseBlock):
     fetch_size: int = Field(
         default=1, description="The number of rows to fetch at a time."
     )
+
+    _connection: Optional[snowflake.connector.SnowflakeConnection] = None
 
     def _get_connect_params(self) -> Dict[str, str]:
         """
@@ -123,6 +125,9 @@ class SnowflakeConnector(DatabaseBlock):
             get_connection_flow()
             ```
         """
+        if self._connection is not None:
+            return self._connection
+
         connect_params = self._get_connect_params()
         connect_params["autocommit"] = autocommit
         connection = snowflake.connector.connect(**connect_params)
@@ -265,7 +270,8 @@ class SnowflakeConnector(DatabaseBlock):
             result = cursor.fetchall()
         return result
 
-    def execute(
+    @sync_compatible
+    async def execute(
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
@@ -285,9 +291,12 @@ class SnowflakeConnector(DatabaseBlock):
         """
         with self.get_connection() as connection:
             with connection.cursor(cursor_type) as cursor:
-                cursor.execute(operation, params=parameters, **execute_kwargs)
+                await run_sync_in_worker_thread(
+                    cursor.execute, operation, params=parameters, **execute_kwargs
+                )
 
-    def execute_many(
+    @sync_compatible
+    async def execute_many(
         self,
         operation: str,
         seq_of_parameters: List[Dict[str, Any]],
@@ -307,9 +316,26 @@ class SnowflakeConnector(DatabaseBlock):
         """
         with self.get_connection() as connection:
             with connection.cursor(cursor_type) as cursor:
-                cursor.executemany(
-                    operation, params=seq_of_parameters, **execute_kwargs
+                await run_sync_in_worker_thread(
+                    cursor.executemany,
+                    operation,
+                    params=seq_of_parameters,
+                    **execute_kwargs,
                 )
+
+    def __enter__(self) -> "SnowflakeConnector":
+        """
+        Start an synchronous database engine upon entry.
+        """
+        self._connection = self.get_connection()
+        return self
+
+    def __exit__(self, *args) -> None:
+        """
+        Dispose the synchronous database engine upon exit.
+        """
+        self._connection.close()
+        self._connection = None
 
 
 @task
