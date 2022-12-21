@@ -51,7 +51,7 @@ def test_snowflake_credentials_validate_okta_endpoint_kwargs(credentials_params)
         SnowflakeCredentials(**credentials_params_missing)
 
     # now test if passing both works
-    credentials_params_missing["okta_endpoint"] = "https://account_name.okta.com"
+    credentials_params_missing["endpoint"] = "https://account_name.okta.com"
     assert SnowflakeCredentials(**credentials_params_missing)
 
 

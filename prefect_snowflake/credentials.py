@@ -137,11 +137,11 @@ class SnowflakeCredentials(Block):
         Ensure an authorization value has been provided by the user.
         """
         authenticator = values.get("authenticator")
-        okta_endpoint = values.get("okta_endpoint")
-        if authenticator == "okta_endpoint" and not okta_endpoint:
+        endpoint = values.get("endpoint")
+        if authenticator == "okta_endpoint" and not endpoint:
             raise ValueError(
                 "If authenticator is set to `okta_endpoint`, "
-                "`okta_endpoint` must be provided"
+                "`endpoint` must be provided"
             )
         return values
 
