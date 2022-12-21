@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- The `okta_endpoint` field in `SnowflakeCredentials`; use `endpoint` instead - [#45](https://github.com/PrefectHQ/prefect-snowflake/pull/45).
+
 ### Removed
 
 ### Fixed
+
+- Fixed misleading validator message in `SnowflakeCredentials` when `authenticator` is `okta_endpoint` - [#45](https://github.com/PrefectHQ/prefect-snowflake/pull/45).
 
 ### Security
 
