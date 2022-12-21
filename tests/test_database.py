@@ -40,7 +40,22 @@ def test_snowflake_connector_get_connect_params_get_secret_value(connector_param
     assert connect_params["password"] == "password"
 
 
-def test_snowflake_connector_get_connect_params_okta_endpoint(connector_params):
+def test_snowflake_connector_get_connect_params_endpoint(connector_params):
+    okta_endpoint = "https://account_name.okta.com"
+    connector_params_okta_endpoint = connector_params.copy()
+    connector_params_okta_endpoint["credentials"].password = None
+    connector_params_okta_endpoint["credentials"].authenticator = "okta_endpoint"
+    connector_params_okta_endpoint["credentials"].endpoint = okta_endpoint
+    snowflake_connector = SnowflakeConnector(**connector_params_okta_endpoint)
+    connect_params = snowflake_connector._get_connect_params()
+    assert connect_params["authenticator"] == okta_endpoint
+    assert connect_params.get("okta_endpoint") is None
+    assert connect_params.get("endpoint") is None
+
+
+def test_snowflake_connector_get_connect_params_deprecated_okta_endpoint(
+    connector_params,
+):
     okta_endpoint = "https://account_name.okta.com"
     connector_params_okta_endpoint = connector_params.copy()
     connector_params_okta_endpoint["credentials"].password = None
@@ -50,6 +65,7 @@ def test_snowflake_connector_get_connect_params_okta_endpoint(connector_params):
     connect_params = snowflake_connector._get_connect_params()
     assert connect_params["authenticator"] == okta_endpoint
     assert connect_params.get("okta_endpoint") is None
+    assert connect_params.get("endpoint") is None
 
 
 def test_snowflake_connector_private_key_is_secret(private_connector_params):
