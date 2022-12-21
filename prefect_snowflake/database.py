@@ -69,7 +69,10 @@ class SnowflakeConnector(Block):
 
         # set authenticator to the actual okta_endpoint
         if connect_params.get("authenticator") == "okta_endpoint":
-            connect_params["authenticator"] = connect_params.pop("okta_endpoint")
+            endpoint = connect_params.pop("endpoint", None) or connect_params.pop(
+                "okta_endpoint", None
+            )  # okta_endpoint is deprecated
+            connect_params["authenticator"] = endpoint
 
         private_der_key = self.credentials.resolve_private_key()
         if private_der_key is not None:
