@@ -53,7 +53,7 @@ class SnowflakeCredentials(Block):
             work in an environment where a browser is available.
         token (SecretStr): The OAuth or JWT Token to provide when
             authenticator is set to OAuth.
-        okta_endpoint (str): The Okta endpoint to use when authenticator is
+        endpoint (str): The Okta endpoint to use when authenticator is
             set to `okta_endpoint`, e.g. `https://<okta_account_name>.okta.com`.
         role (str): The name of the default role to use.
         autocommit (bool): Whether to automatically commit.
