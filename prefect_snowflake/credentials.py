@@ -1,6 +1,7 @@
 """Credentials class to authenticate Snowflake."""
 
 import re
+import warnings
 from typing import Optional, Union
 
 from cryptography.hazmat.backends import default_backend
@@ -52,7 +53,7 @@ class SnowflakeCredentials(Block):
             work in an environment where a browser is available.
         token (SecretStr): The OAuth or JWT Token to provide when
             authenticator is set to OAuth.
-        okta_endpoint (str): The Okta endpoint to use when authenticator is
+        endpoint (str): The Okta endpoint to use when authenticator is
             set to `okta_endpoint`, e.g. `https://<okta_account_name>.okta.com`.
         role (str): The name of the default role to use.
         autocommit (bool): Whether to automatically commit.
@@ -137,11 +138,24 @@ class SnowflakeCredentials(Block):
         Ensure an authorization value has been provided by the user.
         """
         authenticator = values.get("authenticator")
-        okta_endpoint = values.get("okta_endpoint")
-        if authenticator == "okta_endpoint" and not okta_endpoint:
+
+        # did not want to make a breaking change so we will allow both
+        # see https://github.com/PrefectHQ/prefect-snowflake/issues/44
+        if "okta_endpoint" in values.keys():
+            warnings.warn(
+                "Please specify `endpoint` instead of `okta_endpoint`.",
+                DeprecationWarning,
+            )
+            # remove okta endpoint from fields
+            okta_endpoint = values.pop("okta_endpoint")
+            if "endpoint" not in values.keys():
+                values["endpoint"] = okta_endpoint
+
+        endpoint = values.get("endpoint")
+        if authenticator == "okta_endpoint" and not endpoint:
             raise ValueError(
                 "If authenticator is set to `okta_endpoint`, "
-                "`okta_endpoint` must be provided"
+                "`endpoint` must be provided"
             )
         return values
 

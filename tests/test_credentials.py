@@ -51,8 +51,30 @@ def test_snowflake_credentials_validate_okta_endpoint_kwargs(credentials_params)
         SnowflakeCredentials(**credentials_params_missing)
 
     # now test if passing both works
-    credentials_params_missing["okta_endpoint"] = "https://account_name.okta.com"
-    assert SnowflakeCredentials(**credentials_params_missing)
+    credentials_params_missing["endpoint"] = "https://account_name.okta.com"
+    snowflake_credentials = SnowflakeCredentials(**credentials_params_missing)
+    assert snowflake_credentials.endpoint == "https://account_name.okta.com"
+
+
+def test_snowflake_credentials_support_deprecated_okta_endpoint(credentials_params):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "okta_endpoint"
+    credentials_params_missing["okta_endpoint"] = "deprecated.com"
+    snowflake_credentials = SnowflakeCredentials(**credentials_params_missing)
+    assert snowflake_credentials.endpoint == "deprecated.com"
+
+
+def test_snowflake_credentials_support_endpoint_overrides_okta_endpoint(
+    credentials_params,
+):
+    credentials_params_missing = credentials_params.copy()
+    credentials_params_missing.pop("password")
+    credentials_params_missing["authenticator"] = "okta_endpoint"
+    credentials_params_missing["okta_endpoint"] = "deprecated.com"
+    credentials_params_missing["endpoint"] = "new.com"
+    snowflake_credentials = SnowflakeCredentials(**credentials_params_missing)
+    assert snowflake_credentials.endpoint == "new.com"
 
 
 def test_snowflake_private_credentials_init(private_credentials_params):

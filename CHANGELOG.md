@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.3
+
+Released on December 21st, 2022.
+
+### Deprecated
+
+- The `okta_endpoint` field in `SnowflakeCredentials`; use `endpoint` instead - [#45](https://github.com/PrefectHQ/prefect-snowflake/pull/45).
+
+### Fixed
+
+- Fixed misleading validator message in `SnowflakeCredentials` when `authenticator` is `okta_endpoint` - [#45](https://github.com/PrefectHQ/prefect-snowflake/pull/45).
+
 ## 0.2.2
 
 Released on October 5th, 2022.
