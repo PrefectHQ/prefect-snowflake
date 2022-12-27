@@ -41,7 +41,7 @@ pip install prefect-snowflake
 Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
 
 ```bash
-prefect block register -m prefect_snowflake.credentials
+prefect block register -m prefect_snowflake
 ```
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
@@ -125,6 +125,32 @@ def snowflake_put_file_to_snowflake_stage():
     )
             
 ```
+
+### Use `with_options` to customize options on any existing task or flow:
+
+```python
+from prefect import flow
+from prefect_snowflake.database import SnowflakeConnector, snowflake_query_sync
+
+custom_snowflake_query_sync = snowflake_query_sync.with_options(
+    name="My custom task name",
+    retries=2,
+    retry_delay_seconds=10,
+)
+ 
+ @flow
+ def example_with_options_flow():
+    snowflake_connector = SnowflakeConnector.load("my-block")
+    
+    custom_snowflake_query_sync(
+        f"put file:///myfolder/myfile @mystage/mystagepath",
+        snowflake_connector=snowflake_connector
+    )
+ 
+ example_with_options_flow()
+ ```
+ 
+For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://orion-docs.prefect.io/collections/usage/)!
 
 ## Resources
 
