@@ -211,12 +211,9 @@ def test_snowflake_connector_unencrypted_private_key_empty_password(
     snowflake_connector._get_connect_params()
 
 
-
-
 def test_snowflake_connector_encrypted_private_key_is_valid(private_connector_params):
     snowflake_connector = SnowflakeConnector(**private_connector_params)
     assert snowflake_connector.credentials.private_key is not None
     assert snowflake_connector.credentials.password is not None
     # Raises error if invalid
     snowflake_connector._get_connect_params()
-

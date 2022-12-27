@@ -19,7 +19,6 @@ except ImportError:
 
 import snowflake.connector
 from prefect.blocks.abstract import CredentialsBlock
-from prefect.blocks.core import Block
 from pydantic import (
     Field,
     SecretBytes,
@@ -315,6 +314,5 @@ class SnowflakeCredentials(CredentialsBlock):
         if private_der_key is not None:
             connect_params["private_key"] = private_der_key
             connect_params.pop("password", None)
-
 
         return snowflake.connector.connect(**connect_params)
