@@ -78,13 +78,13 @@ class SnowflakeCredentials(CredentialsBlock):
     _block_type_name = "Snowflake Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
-    account: str = Field(..., description="The snowflake account name.")
-    user: str = Field(..., description="The user name used to authenticate.")
+    account: str = Field(..., description="The snowflake account name")
+    user: str = Field(..., description="The user name used to authenticate")
     password: Optional[SecretStr] = Field(
-        default=None, description="The password used to authenticate."
+        default=None, description="The password used to authenticate"
     )
     private_key: Optional[SecretBytes] = Field(
-        default=None, description="The PEM used to authenticate."
+        default=None, description="The PEM used to authenticate"
     )
     authenticator: Literal[
         "snowflake",
@@ -94,12 +94,12 @@ class SnowflakeCredentials(CredentialsBlock):
         "username_password_mfa",
     ] = Field(  # noqa
         default="snowflake",
-        description=("The type of authenticator to use for initializing connection."),
+        description=("The type of authenticator to use for initializing connection"),
     )
     token: Optional[SecretStr] = Field(
         default=None,
         description=(
-            "The OAuth or JWT Token to provide when authenticator is set to `oauth`."
+            "The OAuth or JWT Token to provide when authenticator is set to `oauth`"
         ),
     )
     endpoint: Optional[str] = Field(
@@ -109,16 +109,16 @@ class SnowflakeCredentials(CredentialsBlock):
         ),
     )
     role: Optional[str] = Field(
-        default=None, description="The name of the default role to use."
+        default=None, description="The name of the default role to use"
     )
     autocommit: Optional[bool] = Field(
-        default=None, description="Whether to automatically commit."
+        default=None, description="Whether to automatically commit"
     )
 
     @root_validator(pre=True)
     def _validate_auth_kwargs(cls, values):
         """
-        Ensure an authorization value has been provided by the user.
+        Ensure an authorization value has been provided by the user
         """
         auth_params = ("password", "private_key", "authenticator", "token")
         if not any(values.get(param) for param in auth_params):
