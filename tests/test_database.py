@@ -40,40 +40,6 @@ def test_snowflake_connector_private_key_is_secret(private_connector_params):
     assert isinstance(private_key, (SecretStr, SecretBytes))
 
 
-def test_snowflake_connector_unencrypted_private_key_no_password(
-    private_no_pass_connector_params,
-):
-    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
-    snowflake_connector.credentials.password = None
-    assert snowflake_connector.credentials.private_key is not None
-    # Raises error if invalid
-    snowflake_connector._get_connect_params()
-
-
-def test_snowflake_connector_unencrypted_private_key_empty_password(
-    private_no_pass_connector_params,
-):
-    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
-    assert snowflake_connector.credentials.private_key is not None
-
-    snowflake_connector.credentials.password = SecretBytes(b" ")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretBytes(b"")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretStr("")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretStr("   ")
-    snowflake_connector._get_connect_params()
-
-
-def test_snowflake_connector_encrypted_private_key_is_valid(private_connector_params):
-    snowflake_connector = SnowflakeConnector(**private_connector_params)
-    assert snowflake_connector.credentials.private_key is not None
-    assert snowflake_connector.credentials.password is not None
-    # Raises error if invalid
-    snowflake_connector._get_connect_params()
-
-
 class SnowflakeCursor:
     def __enter__(self):
         return self

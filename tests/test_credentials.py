@@ -220,7 +220,7 @@ def test_snowflake_credentials_get_connect_params_deprecated_okta_endpoint(
     )
 
 
-def test_snowflake_connector_unencrypted_private_key_password(
+def test_snowflake_credentials_unencrypted_private_key_password(
     private_no_pass_credentials_params,
 ):
     snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
@@ -231,3 +231,39 @@ def test_snowflake_connector_unencrypted_private_key_password(
         TypeError, match="Password was given but private key is not encrypted"
     ):
         snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_unencrypted_private_key_no_password(
+    private_no_pass_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
+    snowflake_credentials.password = None
+    assert snowflake_credentials.private_key is not None
+    # Raises error if invalid
+    snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_unencrypted_private_key_empty_password(
+    private_no_pass_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
+    assert snowflake_credentials.private_key is not None
+
+    snowflake_credentials.password = SecretBytes(b" ")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretBytes(b"")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretStr("")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretStr("   ")
+    snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_encrypted_private_key_is_valid(
+    private_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_credentials_params)
+    assert snowflake_credentials.private_key is not None
+    assert snowflake_credentials.password is not None
+    # Raises error if invalid
+    snowflake_credentials.get_client()
