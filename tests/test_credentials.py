@@ -6,13 +6,6 @@ from pydantic import SecretBytes, SecretStr
 from prefect_snowflake.credentials import InvalidPemFormat, SnowflakeCredentials
 
 
-@pytest.fixture
-def snowflake_auth(monkeypatch):
-    auth_mock = MagicMock()
-    auth_mock.authenticate.side_effect = lambda: "authenticated"
-    monkeypatch.setattr("snowflake.connector.connection.Auth", auth_mock)
-
-
 def test_snowflake_credentials_init(credentials_params):
     snowflake_credentials = SnowflakeCredentials(**credentials_params)
     actual_credentials_params = snowflake_credentials.dict()
@@ -178,3 +171,99 @@ def test_snowflake_credentials_validate_private_key_is_pem_bytes(
     with pytest.raises(InvalidPemFormat):
         credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
         assert credentials.resolve_private_key() is not None
+
+
+def test_get_client(credentials_params, snowflake_connect_mock: MagicMock):
+    snowflake_credentials = SnowflakeCredentials(**credentials_params)
+    snowflake_credentials.get_client()
+    snowflake_connect_mock.assert_called_with(
+        application="Prefect_Snowflake_Collection",
+        account="account",
+        user="user",
+        password="password",
+    )
+
+
+def test_get_client_okta_endpoint(
+    credentials_params, snowflake_connect_mock: MagicMock
+):
+    okta_endpoint = "https://account_name.okta.com"
+    credentials_params_okta_endpoint = credentials_params.copy()
+    del credentials_params_okta_endpoint["password"]
+    credentials_params_okta_endpoint["authenticator"] = "okta_endpoint"
+    credentials_params_okta_endpoint["endpoint"] = okta_endpoint
+    snowflake_credentials = SnowflakeCredentials(**credentials_params_okta_endpoint)
+    snowflake_credentials.get_client()
+    snowflake_connect_mock.assert_called_with(
+        application="Prefect_Snowflake_Collection",
+        account="account",
+        user="user",
+        authenticator="https://account_name.okta.com",
+    )
+
+
+def test_snowflake_credentials_deprecated_okta_endpoint(
+    credentials_params, snowflake_connect_mock: MagicMock
+):
+    okta_endpoint = "https://account_name.okta.com"
+    credentials_params_okta_endpoint = credentials_params.copy()
+    del credentials_params_okta_endpoint["password"]
+    credentials_params_okta_endpoint["authenticator"] = "okta_endpoint"
+    credentials_params_okta_endpoint["endpoint"] = okta_endpoint
+    snowflake_credentials = SnowflakeCredentials(**credentials_params_okta_endpoint)
+    snowflake_credentials.get_client()
+    snowflake_connect_mock.assert_called_with(
+        application="Prefect_Snowflake_Collection",
+        account="account",
+        user="user",
+        authenticator="https://account_name.okta.com",
+    )
+
+
+def test_snowflake_credentials_unencrypted_private_key_password(
+    private_no_pass_credentials_params,
+):
+    snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
+    assert snowflake_credentials.private_key is not None
+    assert snowflake_credentials.password is not None
+    # Raises error if invalid
+    with pytest.raises(
+        TypeError, match="Password was given but private key is not encrypted"
+    ):
+        snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_unencrypted_private_key_no_password(
+    private_no_pass_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
+    snowflake_credentials.password = None
+    assert snowflake_credentials.private_key is not None
+    # Raises error if invalid
+    snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_unencrypted_private_key_empty_password(
+    private_no_pass_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
+    assert snowflake_credentials.private_key is not None
+
+    snowflake_credentials.password = SecretBytes(b" ")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretBytes(b"")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretStr("")
+    snowflake_credentials.get_client()
+    snowflake_credentials.password = SecretStr("   ")
+    snowflake_credentials.get_client()
+
+
+def test_snowflake_credentials_encrypted_private_key_is_valid(
+    private_credentials_params, snowflake_connect_mock: MagicMock
+):
+    snowflake_credentials = SnowflakeCredentials(**private_credentials_params)
+    assert snowflake_credentials.private_key is not None
+    assert snowflake_credentials.password is not None
+    # Raises error if invalid
+    snowflake_credentials.get_client()
