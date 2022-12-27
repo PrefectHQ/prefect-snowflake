@@ -1,8 +1,8 @@
-"""Credentials class to authenticate Snowflake."""
+"""Credentials block for authenticating with Snowflake."""
 
 import re
 import warnings
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import (
@@ -17,8 +17,16 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from prefect.blocks.core import Block
-from pydantic import Field, SecretBytes, SecretStr, root_validator, validator
+import snowflake.connector
+from prefect.blocks.abstract import CredentialsBlock
+from pydantic import (
+    Field,
+    SecretBytes,
+    SecretField,
+    SecretStr,
+    root_validator,
+    validator,
+)
 
 # PEM certificates have the pattern:
 #   -----BEGIN PRIVATE KEY-----
@@ -37,7 +45,7 @@ class InvalidPemFormat(Exception):
     """Invalid PEM Format Certificate"""
 
 
-class SnowflakeCredentials(Block):
+class SnowflakeCredentials(CredentialsBlock):
     """
     Block used to manage authentication with Snowflake.
 
@@ -62,6 +70,7 @@ class SnowflakeCredentials(Block):
         Load stored Snowflake credentials:
         ```python
         from prefect_snowflake import SnowflakeCredentials
+
         snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
         ```
     """  # noqa E501
@@ -96,7 +105,7 @@ class SnowflakeCredentials(Block):
     endpoint: Optional[str] = Field(
         default=None,
         description=(
-            "The Okta endpoint to use when authenticator is set to `okta_endpoint`"
+            "The Okta endpoint to use when authenticator is set to `okta_endpoint`."
         ),
     )
     role: Optional[str] = Field(
@@ -245,3 +254,65 @@ class SnowflakeCredentials(Block):
         body = "\n".join(re.split(r"\s+", pem_parts[2].strip()))
         # reassemble header+body+footer
         return f"{pem_parts[1]}\n{body}\n{pem_parts[3]}".encode()
+
+    def get_client(
+        self, **connect_kwargs: Dict[str, Any]
+    ) -> snowflake.connector.SnowflakeConnection:
+        """
+        Returns an authenticated connection that can be used to query
+        Snowflake databases.
+
+        Any additional arguments passed to this method will be used to configure
+        the SnowflakeConnection. For available parameters, please refer to the
+        [Snowflake Python connector documentation](https://docs.snowflake.com/en/user-guide/python-connector-api.html#connect).
+
+        Args:
+            **connect_kwargs: Additional arguments to pass to
+                `snowflake.connector.connect`.
+
+        Returns:
+            An authenticated Snowflake connection.
+
+        Example:
+            Get Snowflake connection with only block configuration:
+            ```python
+            from prefect_snowflake import SnowflakeCredentials
+
+            snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
+
+            connection = snowflake_credentials_block.get_client()
+            ```
+
+            Get Snowflake connector scoped to a specified database:
+            ```python
+            from prefect_snowflake import SnowflakeCredentials
+
+            snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
+
+            connection = snowflake_credentials_block.get_client(database="my_database")
+            ```
+        """  # noqa
+        connect_params = {
+            **connect_kwargs,
+            # required to track task's usage in the Snowflake Partner Network Portal
+            "application": "Prefect_Snowflake_Collection",
+            **self.dict(exclude_unset=True, exclude={"block_type_slug"}),
+        }
+
+        for key, value in connect_params.items():
+            if isinstance(value, SecretField):
+                connect_params[key] = connect_params[key].get_secret_value()
+
+        # set authenticator to the actual okta_endpoint
+        if connect_params.get("authenticator") == "okta_endpoint":
+            endpoint = connect_params.pop("endpoint", None) or connect_params.pop(
+                "okta_endpoint", None
+            )  # okta_endpoint is deprecated
+            connect_params["authenticator"] = endpoint
+
+        private_der_key = self.resolve_private_key()
+        if private_der_key is not None:
+            connect_params["private_key"] = private_der_key
+            connect_params.pop("password", None)
+
+        return snowflake.connector.connect(**connect_params)
