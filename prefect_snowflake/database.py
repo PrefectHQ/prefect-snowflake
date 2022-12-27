@@ -39,10 +39,10 @@ class SnowflakeConnector(Block):
     _block_type_name = "Snowflake Connector"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
-    database: str = Field(..., description="The name of the default database to use")
-    warehouse: str = Field(..., description="The name of the default warehouse to use")
+    database: str = Field(..., description="The name of the default database to use.")
+    warehouse: str = Field(..., description="The name of the default warehouse to use.")
     schema_: str = Field(
-        alias="schema", description="The name of the default schema to use"
+        alias="schema", description="The name of the default schema to use."
     )
     credentials: SnowflakeCredentials
 
