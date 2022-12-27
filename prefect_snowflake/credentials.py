@@ -118,7 +118,7 @@ class SnowflakeCredentials(CredentialsBlock):
     @root_validator(pre=True)
     def _validate_auth_kwargs(cls, values):
         """
-        Ensure an authorization value has been provided by the user
+        Ensure an authorization value has been provided by the user.
         """
         auth_params = ("password", "private_key", "authenticator", "token")
         if not any(values.get(param) for param in auth_params):
@@ -271,26 +271,26 @@ class SnowflakeCredentials(CredentialsBlock):
                 `snowflake.connector.connect`.
 
         Returns:
-            Authenticated Snowflake connection
+            An authenticated Snowflake connection.
 
         Example:
             Get Snowflake connection with only block configuration:
-                ```python
-                from prefect_snowflake import SnowflakeCredentials
+            ```python
+            from prefect_snowflake import SnowflakeCredentials
 
-                snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
+            snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
 
-                connection = snowflake_credentials_block.get_client()
-                ```
+            connection = snowflake_credentials_block.get_client()
+            ```
 
             Get Snowflake connector scoped to a specified database:
-                ```python
-                from prefect_snowflake import SnowflakeCredentials
+            ```python
+            from prefect_snowflake import SnowflakeCredentials
 
-                snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
+            snowflake_credentials_block = SnowflakeCredentials.load("BLOCK_NAME")
 
-                connection = snowflake_credentials_block.get_client(database="my_database")
-                ```
+            connection = snowflake_credentials_block.get_client(database="my_database")
+            ```
         """  # noqa
         connect_params = {
             **connect_kwargs,

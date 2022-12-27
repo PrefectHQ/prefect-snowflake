@@ -58,10 +58,16 @@ class SnowflakeConnector(Block):
 
         return connect_params
 
-    def get_connection(self) -> snowflake.connector.SnowflakeConnection:
+    def get_connection(
+        self, **connect_kwargs: Dict[str, Any]
+    ) -> snowflake.connector.SnowflakeConnection:
         """
         Returns an authenticated connection that can be
         used to query from Snowflake databases.
+
+        Args:
+            **connect_kwargs: Additional arguments to pass to
+                `snowflake.connector.connect`.
 
         Returns:
             The authenticated SnowflakeConnection.
@@ -92,7 +98,7 @@ class SnowflakeConnector(Block):
             ```
         """
         connect_params = self._get_connect_params()
-        connection = self.credentials.get_client(**connect_params)
+        connection = self.credentials.get_client(**connect_kwargs, **connect_params)
         return connection
 
 

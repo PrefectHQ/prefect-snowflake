@@ -191,7 +191,7 @@ def test_get_client_okta_endpoint(
     credentials_params_okta_endpoint = credentials_params.copy()
     del credentials_params_okta_endpoint["password"]
     credentials_params_okta_endpoint["authenticator"] = "okta_endpoint"
-    credentials_params_okta_endpoint["okta_endpoint"] = okta_endpoint
+    credentials_params_okta_endpoint["endpoint"] = okta_endpoint
     snowflake_credentials = SnowflakeCredentials(**credentials_params_okta_endpoint)
     snowflake_credentials.get_client()
     snowflake_connect_mock.assert_called_with(
@@ -202,14 +202,14 @@ def test_get_client_okta_endpoint(
     )
 
 
-def test_snowflake_credentials_get_connect_params_deprecated_okta_endpoint(
+def test_snowflake_credentials_deprecated_okta_endpoint(
     credentials_params, snowflake_connect_mock: MagicMock
 ):
     okta_endpoint = "https://account_name.okta.com"
     credentials_params_okta_endpoint = credentials_params.copy()
     del credentials_params_okta_endpoint["password"]
     credentials_params_okta_endpoint["authenticator"] = "okta_endpoint"
-    credentials_params_okta_endpoint["okta_endpoint"] = okta_endpoint
+    credentials_params_okta_endpoint["endpoint"] = okta_endpoint
     snowflake_credentials = SnowflakeCredentials(**credentials_params_okta_endpoint)
     snowflake_credentials.get_client()
     snowflake_connect_mock.assert_called_with(
