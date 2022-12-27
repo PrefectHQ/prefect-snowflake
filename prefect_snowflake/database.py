@@ -1,4 +1,4 @@
-"""Module for querying against Snowflake database."""
+"""Module for querying against Snowflake databases."""
 
 import asyncio
 from typing import Any, Dict, List, Tuple, Union
@@ -31,6 +31,7 @@ class SnowflakeConnector(Block):
         Load stored Snowflake connector:
         ```python
         from prefect_snowflake.database import SnowflakeConnector
+
         snowflake_connector_block = SnowflakeConnector.load("BLOCK_NAME")
         ```
     """  # noqa
@@ -53,31 +54,7 @@ class SnowflakeConnector(Block):
             "database": self.database,
             "warehouse": self.warehouse,
             "schema": self.schema_,
-            # required to track task's usage in the Snowflake Partner Network Portal
-            "application": "Prefect_Snowflake_Collection",
-            **self.credentials.dict(),
         }
-
-        # filter out unset values
-        connect_params = {
-            param: value for param, value in connect_params.items() if value is not None
-        }
-
-        for param in ("password", "private_key", "token"):
-            if param in connect_params:
-                connect_params[param] = connect_params[param].get_secret_value()
-
-        # set authenticator to the actual okta_endpoint
-        if connect_params.get("authenticator") == "okta_endpoint":
-            endpoint = connect_params.pop("endpoint", None) or connect_params.pop(
-                "okta_endpoint", None
-            )  # okta_endpoint is deprecated
-            connect_params["authenticator"] = endpoint
-
-        private_der_key = self.credentials.resolve_private_key()
-        if private_der_key is not None:
-            connect_params["private_key"] = private_der_key
-            connect_params.pop("password", None)
 
         return connect_params
 
@@ -115,7 +92,7 @@ class SnowflakeConnector(Block):
             ```
         """
         connect_params = self._get_connect_params()
-        connection = snowflake.connector.connect(**connect_params)
+        connection = self.credentials.get_client(**connect_params)
         return connection
 
 

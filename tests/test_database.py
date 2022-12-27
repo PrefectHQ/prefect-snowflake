@@ -34,93 +34,6 @@ def test_snowflake_connector_password_is_secret_str(connector_params):
     assert password.get_secret_value() == "password"
 
 
-def test_snowflake_connector_get_connect_params_get_secret_value(connector_params):
-    snowflake_connector = SnowflakeConnector(**connector_params)
-    connect_params = snowflake_connector._get_connect_params()
-    assert connect_params["password"] == "password"
-
-
-def test_snowflake_connector_get_connect_params_endpoint(connector_params):
-    okta_endpoint = "https://account_name.okta.com"
-    connector_params_okta_endpoint = connector_params.copy()
-    connector_params_okta_endpoint["credentials"].password = None
-    connector_params_okta_endpoint["credentials"].authenticator = "okta_endpoint"
-    connector_params_okta_endpoint["credentials"].endpoint = okta_endpoint
-    snowflake_connector = SnowflakeConnector(**connector_params_okta_endpoint)
-    connect_params = snowflake_connector._get_connect_params()
-    assert connect_params["authenticator"] == okta_endpoint
-    assert connect_params.get("okta_endpoint") is None
-    assert connect_params.get("endpoint") is None
-
-
-def test_snowflake_connector_get_connect_params_deprecated_okta_endpoint(
-    connector_params,
-):
-    okta_endpoint = "https://account_name.okta.com"
-    connector_params_okta_endpoint = connector_params.copy()
-    connector_params_okta_endpoint["credentials"].password = None
-    connector_params_okta_endpoint["credentials"].authenticator = "okta_endpoint"
-    connector_params_okta_endpoint["credentials"].okta_endpoint = okta_endpoint
-    snowflake_connector = SnowflakeConnector(**connector_params_okta_endpoint)
-    connect_params = snowflake_connector._get_connect_params()
-    assert connect_params["authenticator"] == okta_endpoint
-    assert connect_params.get("okta_endpoint") is None
-    assert connect_params.get("endpoint") is None
-
-
-def test_snowflake_connector_private_key_is_secret(private_connector_params):
-    snowflake_connector = SnowflakeConnector(**private_connector_params)
-    private_key = snowflake_connector.credentials.private_key
-    assert isinstance(private_key, (SecretStr, SecretBytes))
-
-
-def test_snowflake_connector_encrypted_private_key_is_valid(private_connector_params):
-    snowflake_connector = SnowflakeConnector(**private_connector_params)
-    assert snowflake_connector.credentials.private_key is not None
-    assert snowflake_connector.credentials.password is not None
-    # Raises error if invalid
-    snowflake_connector._get_connect_params()
-
-
-def test_snowflake_connector_unencrypted_private_key_no_password(
-    private_no_pass_connector_params,
-):
-    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
-    snowflake_connector.credentials.password = None
-    assert snowflake_connector.credentials.private_key is not None
-    # Raises error if invalid
-    snowflake_connector._get_connect_params()
-
-
-def test_snowflake_connector_unencrypted_private_key_empty_password(
-    private_no_pass_connector_params,
-):
-    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
-    assert snowflake_connector.credentials.private_key is not None
-
-    snowflake_connector.credentials.password = SecretBytes(b" ")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretBytes(b"")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretStr("")
-    snowflake_connector._get_connect_params()
-    snowflake_connector.credentials.password = SecretStr("   ")
-    snowflake_connector._get_connect_params()
-
-
-def test_snowflake_connector_unencrypted_private_key_password(
-    private_no_pass_connector_params,
-):
-    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
-    assert snowflake_connector.credentials.private_key is not None
-    assert snowflake_connector.credentials.password is not None
-    # Raises error if invalid
-    with pytest.raises(
-        TypeError, match="Password was given but private key is not encrypted"
-    ):
-        snowflake_connector._get_connect_params()
-
-
 class SnowflakeCursor:
     def __enter__(self):
         return self
@@ -264,3 +177,46 @@ def test_snowflake_private_connector_init(private_connector_params):
         if isinstance(actual, (SecretStr, SecretBytes)):
             actual = actual.get_secret_value()
         assert actual == expected
+
+
+def test_snowflake_connector_private_key_is_secret(private_connector_params):
+    snowflake_connector = SnowflakeConnector(**private_connector_params)
+    private_key = snowflake_connector.credentials.private_key
+    assert isinstance(private_key, (SecretStr, SecretBytes))
+
+
+def test_snowflake_connector_unencrypted_private_key_no_password(
+    private_no_pass_connector_params,
+):
+    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
+    snowflake_connector.credentials.password = None
+    assert snowflake_connector.credentials.private_key is not None
+    # Raises error if invalid
+    snowflake_connector._get_connect_params()
+
+
+def test_snowflake_connector_unencrypted_private_key_empty_password(
+    private_no_pass_connector_params,
+):
+    snowflake_connector = SnowflakeConnector(**private_no_pass_connector_params)
+    assert snowflake_connector.credentials.private_key is not None
+
+    snowflake_connector.credentials.password = SecretBytes(b" ")
+    snowflake_connector._get_connect_params()
+    snowflake_connector.credentials.password = SecretBytes(b"")
+    snowflake_connector._get_connect_params()
+    snowflake_connector.credentials.password = SecretStr("")
+    snowflake_connector._get_connect_params()
+    snowflake_connector.credentials.password = SecretStr("   ")
+    snowflake_connector._get_connect_params()
+
+
+
+
+def test_snowflake_connector_encrypted_private_key_is_valid(private_connector_params):
+    snowflake_connector = SnowflakeConnector(**private_connector_params)
+    assert snowflake_connector.credentials.private_key is not None
+    assert snowflake_connector.credentials.password is not None
+    # Raises error if invalid
+    snowflake_connector._get_connect_params()
+
