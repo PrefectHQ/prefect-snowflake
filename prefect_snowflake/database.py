@@ -97,7 +97,10 @@ class SnowflakeConnector(DatabaseBlock):
     poll_frequency_s: int = Field(
         default=1,
         title="Poll Frequency [seconds]",
-        description="The number of seconds between checking query status for long running queries.",
+        description=(
+            "The number of seconds between checking query "
+            "status for long running queries."
+        ),
     )
 
     _connection: Optional[SnowflakeConnection] = None
@@ -265,7 +268,7 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             Fetch one row from the database where address is Space.
-            ```
+            ```python
             from prefect_snowflake.database import SnowflakeConnector
 
             with SnowflakeConnector.load("BLOCK_NAME") as conn:
@@ -327,7 +330,7 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             Repeatedly fetch two rows from the database where address is Highway 42.
-            ```
+            ```python
             from prefect_snowflake.database import SnowflakeConnector
 
             with SnowflakeConnector.load("BLOCK_NAME") as conn:
@@ -395,7 +398,7 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             Fetch all rows from the database where address is Highway 42.
-            ```
+            ```python
             from prefect_snowflake.database import SnowflakeConnector
 
             with SnowflakeConnector.load("BLOCK_NAME") as conn:
@@ -450,7 +453,7 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             Create table named customers with two columns, name and address.
-            ```
+            ```python
             from prefect_snowflake.database import SnowflakeConnector
 
             with SnowflakeConnector.load("BLOCK_NAME") as conn:
@@ -486,7 +489,7 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             Create table and insert three rows into it.
-            ```
+            ```python
             from prefect_snowflake.database import SnowflakeConnector
 
             with SnowflakeConnector.load("BLOCK_NAME") as conn:
