@@ -33,11 +33,13 @@ class SnowflakeConnector(DatabaseBlock):
     the state of the block's connection and cursor could be lost.
 
     Args:
-        database (str): The name of the default database to use.
-        warehouse (str): The name of the default warehouse to use.
-        schema (str): The name of the default schema to use;
+        credentials: The credentials to authenticate with Snowflake.
+        database: The name of the default database to use.
+        warehouse: The name of the default warehouse to use.
+        schema: The name of the default schema to use;
             this attribute is accessible through `SnowflakeConnector(...).schema_`.
-        credentials (SnowflakeCredentials): The credentials to authenticate with Snowflake.
+        fetch_size: The number of rows to fetch at a time.
+        poll_frequency_s: The number of seconds before checking query.
 
     Examples:
         Load stored Snowflake connector as a context manager:
