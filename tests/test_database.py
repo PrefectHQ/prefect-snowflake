@@ -183,3 +183,61 @@ def test_snowflake_private_connector_init(private_connector_params):
         if isinstance(actual, (SecretStr, SecretBytes)):
             actual = actual.get_secret_value()
         assert actual == expected
+
+
+class TestSnowflakeConnector:
+    @pytest.fixture
+    def snowflake_connector(self, connector_params, snowflake_connect_mock):
+        connector = SnowflakeConnector(**connector_params)
+        return connector
+
+    def test_block_initialization(self, snowflake_connector):
+        assert snowflake_connector._connection is not None
+        assert snowflake_connector._unique_cursors == {}
+
+    def test_get_connection(self, snowflake_connector: SnowflakeConnector):
+        connection = snowflake_connector.get_connection()
+        assert snowflake_connector._connection is connection
+
+    def test_reset_cursors(self, snowflake_connector: SnowflakeConnector):
+        mock_cursor = MagicMock()
+        snowflake_connector._unique_cursors["12345"] = mock_cursor
+        snowflake_connector.reset_cursors()
+        assert len(snowflake_connector._unique_cursors) == 0
+        mock_cursor.close.assert_called_once()
+
+    def test_fetch_one(self, snowflake_connector: SnowflakeConnector):
+        result = snowflake_connector.fetch_one("query", parameters=("param",))
+        assert result == (0,)
+        result = snowflake_connector.fetch_one("query", parameters=("param",))
+        assert result == (1,)
+
+    def test_fetch_many(self, snowflake_connector: SnowflakeConnector):
+        result = snowflake_connector.fetch_many("query", parameters=("param",), size=2)
+        assert result == [(0,), (1,)]
+        result = snowflake_connector.fetch_many("query", parameters=("param",))
+        assert result == [(2,)]
+
+    def test_fetch_all(self, snowflake_connector: SnowflakeConnector):
+        result = snowflake_connector.fetch_all("query", parameters=("param",))
+        assert result == [(0,), (1,), (2,), (3,), (4,), (5,)]
+
+    def test_execute(self, snowflake_connector: SnowflakeConnector):
+        assert snowflake_connector.execute("query", parameters=("param",)) is None
+
+    def test_execute_Many(self, snowflake_connector: SnowflakeConnector):
+        assert (
+            snowflake_connector.execute_many("query", seq_of_parameters=[("param",)])
+            is None
+        )
+
+    def test_close(self, snowflake_connector: SnowflakeConnector):
+        assert snowflake_connector.close() is None
+        assert snowflake_connector._connection is None
+        assert snowflake_connector._unique_cursors == {}
+
+    def test_context_management(self, snowflake_connector):
+        with snowflake_connector:
+            pass
+        assert snowflake_connector._connection is None
+        assert snowflake_connector._unique_cursors == {}

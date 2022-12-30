@@ -119,6 +119,18 @@ def private_malformed_credentials_params():
 
 @pytest.fixture
 def snowflake_connect_mock(monkeypatch):
-    connect_mock = MagicMock()
-    monkeypatch.setattr("snowflake.connector.connect", connect_mock)
-    return connect_mock
+    mock_cursor = MagicMock(name="cursor mock")
+    results = iter([0, 1, 2, 3, 4])
+    mock_cursor.return_value.fetchone.side_effect = lambda: (next(results),)
+    mock_cursor.return_value.fetchmany.side_effect = lambda size: list(
+        (next(results),) for i in range(size)
+    )
+    mock_cursor.return_value.fetchall.side_effect = lambda: [
+        (result,) for result in results
+    ]
+
+    mock_connection = MagicMock(name="connection mock")
+    mock_connection.return_value.is_still_running.return_value = False
+    mock_connection.return_value.cursor = mock_cursor
+    monkeypatch.setattr("snowflake.connector.connect", mock_connection)
+    return mock_connection
