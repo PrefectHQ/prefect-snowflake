@@ -9,12 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `fetch_size` and `poll_frequency_s` to `SnowflakeConnector` fields - [#53](https://github.com/PrefectHQ/prefect-snowflake/pull/53)
-- `reset_cursors`, `fetch_one`, `fetch_many`, `fetch_all`, `execute`, `execute_many`, and `close` methods to `SnowflakeConnector` fields - [#53](https://github.com/PrefectHQ/prefect-snowflake/pull/53)
-
 ### Changed
-
-- Added `get_client` method to `SnowflakeCredentials` to enable more customization of connection creation - [#51](https://github.com/PrefectHQ/prefect-snowflake/pull/51)
 
 ### Deprecated
 
@@ -23,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.2.4
+
+Released on December 30th, 2022.
+
+### Added
+
+- `fetch_size` and `poll_frequency_s` to `SnowflakeConnector` fields - [#53](https://github.com/PrefectHQ/prefect-snowflake/pull/53)
+- `reset_cursors`, `fetch_one`, `fetch_many`, `fetch_all`, `execute`, `execute_many`, and `close` methods to `SnowflakeConnector` fields - [#53](https://github.com/PrefectHQ/prefect-snowflake/pull/53)
+
+### Changed
+
+- Added `get_client` method to `SnowflakeCredentials` to enable more customization of connection creation - [#51](https://github.com/PrefectHQ/prefect-snowflake/pull/51)
 
 ## 0.2.3
 
