@@ -46,15 +46,14 @@ class SnowflakeConnector(DatabaseBlock):
         ```python
         from prefect_snowflake.database import SnowflakeConnector
 
-        with SnowflakeConnector.load("BLOCK_NAME") as connector:
-            ...
+        snowflake_connector = SnowflakeConnector.load("BLOCK_NAME"):
         ```
 
         Insert data into database and fetch results.
         ```python
         from prefect_snowflake.database import SnowflakeConnector
 
-        with SnowflakeConnector.load("snowflake-connector") as database:
+        with SnowflakeConnector.load("BLOCK_NAME") as database:
             database.execute(
                 "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
             )

@@ -81,7 +81,7 @@ class SnowflakeConnection:
 
 
 @pytest.fixture()
-def snowflake_connector():
+def snowflake_connector(snowflake_connect_mock):
     snowflake_connector_mock = MagicMock()
     snowflake_connector_mock.get_connection.return_value = SnowflakeConnection()
     return snowflake_connector_mock
@@ -220,7 +220,7 @@ class TestSnowflakeConnector:
 
     def test_fetch_all(self, snowflake_connector: SnowflakeConnector):
         result = snowflake_connector.fetch_all("query", parameters=("param",))
-        assert result == [(0,), (1,), (2,), (3,), (4,), (5,)]
+        assert result == [(0,), (1,), (2,), (3,), (4,)]
 
     def test_execute(self, snowflake_connector: SnowflakeConnector):
         assert snowflake_connector.execute("query", parameters=("param",)) is None

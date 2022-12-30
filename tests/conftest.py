@@ -117,7 +117,7 @@ def private_malformed_credentials_params():
     }
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def snowflake_connect_mock(monkeypatch):
     mock_cursor = MagicMock(name="cursor mock")
     results = iter([0, 1, 2, 3, 4])
