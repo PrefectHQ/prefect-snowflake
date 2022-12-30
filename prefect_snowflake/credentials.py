@@ -78,7 +78,9 @@ class SnowflakeCredentials(CredentialsBlock):
     _block_type_name = "Snowflake Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
 
-    account: str = Field(..., description="The snowflake account name.")
+    account: str = Field(
+        ..., description="The snowflake account name.", example="nh12345.us-east-2.aws"
+    )
     user: str = Field(..., description="The user name used to authenticate.")
     password: Optional[SecretStr] = Field(
         default=None, description="The password used to authenticate."
