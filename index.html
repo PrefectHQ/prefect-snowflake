@@ -88,7 +88,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="prefect-snowflake" class="md-header__button md-logo" aria-label="prefect-snowflake" data-md-component="logo">
       
-  <img src="img/prefect-logo-white.png" alt="logo">
+  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -185,7 +185,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="prefect-snowflake" class="md-nav__button md-logo" aria-label="prefect-snowflake" data-md-component="logo">
       
-  <img src="img/prefect-logo-white.png" alt="logo">
+  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
 
     </a>
     prefect-snowflake
@@ -296,6 +296,40 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#use-with_options-to-customize-options-on-any-existing-task-or-flow" class="md-nav__link">
+    Use with_options to customize options on any existing task or flow:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blocks-catalog" class="md-nav__link">
+    Blocks Catalog
+  </a>
+  
+    <nav class="md-nav" aria-label="Blocks Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials-module" class="md-nav__link">
+    Credentials Module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-module" class="md-nav__link">
+    Database Module
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -309,9 +343,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development" class="md-nav__link">
-    Development
+  <a href="#contribute" class="md-nav__link">
+    Contribute
   </a>
+  
+    <nav class="md-nav" aria-label="Contribute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contribution-steps" class="md-nav__link">
+    Contribution Steps:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -429,6 +476,40 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#use-with_options-to-customize-options-on-any-existing-task-or-flow" class="md-nav__link">
+    Use with_options to customize options on any existing task or flow:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blocks-catalog" class="md-nav__link">
+    Blocks Catalog
+  </a>
+  
+    <nav class="md-nav" aria-label="Blocks Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials-module" class="md-nav__link">
+    Credentials Module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-module" class="md-nav__link">
+    Database Module
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -442,9 +523,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development" class="md-nav__link">
-    Development
+  <a href="#contribute" class="md-nav__link">
+    Contribute
   </a>
+  
+    <nav class="md-nav" aria-label="Contribute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contribution-steps" class="md-nav__link">
+    Contribution Steps:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -479,9 +573,9 @@
     <a href="https://github.com/PrefectHQ/prefect-snowflake/pulse" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
     <br>
-    <a href="https://prefect-snowflake-community.slack.com" alt="Slack">
+    <a href="https://prefect-community.slack.com" alt="Slack">
         <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
-    <a href="https://discourse.prefect-snowflake.io/" alt="Discourse">
+    <a href="https://discourse.prefect.io/" alt="Discourse">
         <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
 </p>
 
@@ -496,10 +590,7 @@
 <p>Install <code>prefect-snowflake</code> with <code>pip</code>:</p>
 <div class="highlight"><pre><span></span><code>pip install prefect-snowflake
 </code></pre></div>
-<p>Then, register to <a href="https://orion-docs.prefect.io/ui/blocks/">view the block</a> on Prefect Cloud:</p>
-<div class="highlight"><pre><span></span><code>prefect block register -m prefect_snowflake.credentials
-</code></pre></div>
-<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<p>A list of available blocks in <code>prefect-snowflake</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-snowflake/#blocks-catalog">here</a>.</p>
 <h3 id="query-from-table">Query from table</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 <span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
@@ -569,21 +660,82 @@
         <span class="n">snowflake_connector</span><span class="o">=</span><span class="n">snowflake_connector</span>
     <span class="p">)</span>
 </code></pre></div>
+<h3 id="use-with_options-to-customize-options-on-any-existing-task-or-flow">Use <code>with_options</code> to customize options on any existing task or flow:</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span><span class="p">,</span> <span class="n">snowflake_query_sync</span>
+
+<span class="n">custom_snowflake_query_sync</span> <span class="o">=</span> <span class="n">snowflake_query_sync</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;My custom task name&quot;</span><span class="p">,</span>
+    <span class="n">retries</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">retry_delay_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">example_with_options_flow</span><span class="p">():</span>
+<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block&quot;</span><span class="p">)</span>
+
+<span class="n">custom_snowflake_query_sync</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;put file:///myfolder/myfile @mystage/mystagepath&quot;</span><span class="p">,</span>
+    <span class="n">snowflake_connector</span><span class="o">=</span><span class="n">snowflake_connector</span>
+<span class="p">)</span>
+
+<span class="n">example_with_options_flow</span><span class="p">()</span>
+</code></pre></div>
+<p>For more tips on how to use tasks and flows in a Collection, check out <a href="https://orion-docs.prefect.io/collections/usage/">Using Collections</a>!</p>
+<h2 id="blocks-catalog">Blocks Catalog</h2>
+<p>Below is a list of Blocks available for registration in
+<code>prefect-snowflake</code>.</p>
+<p>To register blocks in this module to
+<a href="https://orion-docs.prefect.io/ui/blocks/">view and edit them</a>
+on Prefect Cloud:
+<div class="highlight"><pre><span></span><code>prefect block register -m prefect_snowflake
+</code></pre></div>
+Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<h3 id="credentials-module">Credentials Module</h3>
+<p><strong><a class="autorefs autorefs-internal" href="credentials/#prefect_snowflake.credentials.SnowflakeCredentials">SnowflakeCredentials</a></strong></p>
+<p>To load the SnowflakeCredentials:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
+    <span class="n">my_block</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+
+<span class="n">my_flow</span><span class="p">()</span>
+</code></pre></div></p>
+<h3 id="database-module">Database Module</h3>
+<p><strong><a class="autorefs autorefs-internal" href="database/#prefect_snowflake.database.SnowflakeConnector">SnowflakeConnector</a></strong></p>
+<p>To load the SnowflakeConnector:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="nd">@flow</span>
+<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
+    <span class="n">my_block</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
+
+<span class="n">my_flow</span><span class="p">()</span>
+</code></pre></div></p>
 <h2 id="resources">Resources</h2>
 <p>If you encounter any bugs while using <code>prefect-snowflake</code>, feel free to open an issue in the <a href="https://github.com/PrefectHQ/prefect-snowflake">prefect-snowflake</a> repository.</p>
 <p>If you have any questions or issues while using <code>prefect-snowflake</code>, you can find help in either the <a href="https://discourse.prefect.io/">Prefect Discourse forum</a> or the <a href="https://prefect.io/slack">Prefect Slack community</a>.</p>
-<p>Feel free to ⭐️ or watch <a href="https://github.com/PrefectHQ/prefect-snowflake"><code>prefect-snowflake</code></a> for updates too!</p>
-<h2 id="development">Development</h2>
-<p>If you'd like to install a version of <code>prefect-snowflake</code> for development, clone the repository and perform an editable install with <code>pip</code>:</p>
-<div class="highlight"><pre><span></span><code>git clone https://github.com/PrefectHQ/prefect-snowflake.git
-
-<span class="nb">cd</span> prefect-snowflake/
-
-pip install -e <span class="s2">&quot;.[dev]&quot;</span>
-
-<span class="c1"># Install linting pre-commit hooks</span>
-pre-commit install
-</code></pre></div>
+<p>Feel free to star or watch <a href="https://github.com/PrefectHQ/prefect-snowflake"><code>prefect-snowflake</code></a> for updates too!</p>
+<h2 id="contribute">Contribute</h2>
+<p>If you'd like to help contribute to fix an issue or add a feature to <code>prefect-snowflake</code>, please <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork">propose changes through a pull request from a fork of the repository</a>.</p>
+<h3 id="contribution-steps">Contribution Steps:</h3>
+<ol>
+<li><a href="https://docs.github.com/en/get-started/quickstart/fork-a-repo#forking-a-repository">Fork the repository</a></li>
+<li><a href="https://docs.github.com/en/get-started/quickstart/fork-a-repo#cloning-your-forked-repository">Clone the forked repository</a></li>
+<li>Install the repository and its dependencies:
+<div class="highlight"><pre><span></span><code>pip install -e &quot;.[dev]&quot;
+</code></pre></div></li>
+<li>Make desired changes.</li>
+<li>Add tests.</li>
+<li>Insert an entry to <a href="https://github.com/PrefectHQ/prefect-snowflake/blob/main/CHANGELOG.md">CHANGELOG.md</a></li>
+<li>Install <code>pre-commit</code> to perform quality checks prior to commit:
+<div class="highlight"><pre><span></span><code>pre-commit install
+</code></pre></div></li>
+<li><code>git commit</code>, <code>git push</code>, and create a pull request.</li>
+</ol>
 
 
 
