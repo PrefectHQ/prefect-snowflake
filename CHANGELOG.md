@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added `get_client` method to `SnowflakeCredentials` to enable more customization of connection creation - [#51](https://github.com/PrefectHQ/prefect-snowflake/pull/51)
+
 ### Deprecated
 
 ### Removed
