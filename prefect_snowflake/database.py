@@ -30,7 +30,7 @@ class SnowflakeConnector(DatabaseBlock):
 
     It is also recommended that this block is loaded and consumed within a single task
     or flow because if the block is passed across separate tasks and flows,
-    the state of the block's connection and cursor could be lost.
+    the state of the block's connection and cursor will be lost.
 
     Args:
         credentials: The credentials to authenticate with Snowflake.
@@ -75,6 +75,7 @@ class SnowflakeConnector(DatabaseBlock):
 
     _block_type_name = "Snowflake Connector"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
+    _description = "Perform data operations against a Snowflake database."
 
     credentials: SnowflakeCredentials = Field(
         default=..., description="The credentials to authenticate with Snowflake."
@@ -91,12 +92,12 @@ class SnowflakeConnector(DatabaseBlock):
         description="The name of the default schema to use.",
     )
     fetch_size: int = Field(
-        default=1, description="The number of rows to fetch at a time."
+        default=1, description="The default number of rows to fetch at a time."
     )
     poll_frequency_s: int = Field(
         default=1,
         title="Poll Frequency [seconds]",
-        description="The number of seconds before checking query.",
+        description="The number of seconds between checking query status for long running queries.",
     )
 
     _connection: Optional[SnowflakeConnection] = None
@@ -171,11 +172,12 @@ class SnowflakeConnector(DatabaseBlock):
             Whether a cursor is new and a Snowflake cursor.
         """
         input_hash = hash_objects(inputs)
-        assert input_hash is not None, (
-            "We were not able to hash your inputs, "
-            "which resulted in an unexpected data return; "
-            "please open an issue with a reproducible example."
-        )
+        if input_hash is None:
+            raise RuntimeError(
+                "We were not able to hash your inputs, "
+                "which resulted in an unexpected data return; "
+                "please open an issue with a reproducible example."
+            )
         if input_hash not in self._unique_cursors.keys():
             new_cursor = self._connection.cursor()
             self._unique_cursors[input_hash] = new_cursor
