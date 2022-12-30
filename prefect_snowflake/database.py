@@ -53,11 +53,11 @@ class SnowflakeConnector(DatabaseBlock):
         ```python
         from prefect_snowflake.database import SnowflakeConnector
 
-        with SnowflakeConnector.load("BLOCK_NAME") as database:
-            database.execute(
+        with SnowflakeConnector.load("BLOCK_NAME") as conn:
+            conn.execute(
                 "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
             )
-            database.execute_many(
+            conn.execute_many(
                 "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
                 seq_of_parameters=[
                     {"name": "Ford", "address": "Highway 42"},
@@ -65,7 +65,7 @@ class SnowflakeConnector(DatabaseBlock):
                     {"name": "Me", "address": "Myway 88"},
                 ],
             )
-            results = database.fetch_all(
+            results = conn.fetch_all(
                 "SELECT * FROM customers WHERE address = %(address)s",
                 parameters={"address": "Space"}
             )
@@ -116,27 +116,22 @@ class SnowflakeConnector(DatabaseBlock):
 
         Examples:
             ```python
-            from prefect import flow
             from prefect_snowflake.credentials import SnowflakeCredentials
             from prefect_snowflake.database import SnowflakeConnector
 
-
-            @flow
-            def get_connection_flow():
-                snowflake_credentials = SnowflakeCredentials(
-                    account="account",
-                    user="user",
-                    password="password",
-                )
-                snowflake_connector = SnowflakeConnector(
-                    database="database",
-                    warehouse="warehouse",
-                    schema="schema",
-                    credentials=snowflake_credentials
-                )
-                print(snowflake_connector.get_connection())
-
-            get_connection_flow()
+            snowflake_credentials = SnowflakeCredentials(
+                account="account",
+                user="user",
+                password="password",
+            )
+            snowflake_connector = SnowflakeConnector(
+                database="database",
+                warehouse="warehouse",
+                schema="schema",
+                credentials=snowflake_credentials
+            )
+            with snowflake_connector.get_connection() as connection:
+                ...
             ```
         """
         if self._connection is not None:
@@ -209,7 +204,29 @@ class SnowflakeConnector(DatabaseBlock):
     def reset_cursors(self) -> None:
         """
         Tries to close all opened cursors.
-        """
+
+        Examples:
+            Reset the cursors to refresh cursor position.
+            ```python
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+                )
+                conn.execute_many(
+                    "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+                    seq_of_parameters=[
+                        {"name": "Ford", "address": "Highway 42"},
+                        {"name": "Unknown", "address": "Space"},
+                        {"name": "Me", "address": "Myway 88"},
+                    ],
+                )
+                print(conn.fetch_one("SELECT * FROM customers"))  # Ford
+                conn.reset_cursors()
+                print(conn.fetch_one("SELECT * FROM customers"))  # should be Ford again
+            ```
+        """  # noqa
         input_hashes = tuple(self._unique_cursors.keys())
         for input_hash in input_hashes:
             cursor = self._unique_cursors.pop(input_hash)
@@ -243,7 +260,31 @@ class SnowflakeConnector(DatabaseBlock):
         Returns:
             A tuple containing the data returned by the database,
                 where each row is a tuple and each column is a value in the tuple.
-        """
+
+        Examples:
+            Fetch one row from the database where address is Space.
+            ```
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+                )
+                conn.execute_many(
+                    "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+                    seq_of_parameters=[
+                        {"name": "Ford", "address": "Highway 42"},
+                        {"name": "Unknown", "address": "Space"},
+                        {"name": "Me", "address": "Myway 88"},
+                    ],
+                )
+                result = conn.fetch_one(
+                    "SELECT * FROM customers WHERE address = %(address)s",
+                    parameters={"address": "Space"}
+                )
+                print(result)
+            ```
+        """  # noqa
         inputs = dict(
             command=operation,
             params=parameters,
@@ -281,7 +322,39 @@ class SnowflakeConnector(DatabaseBlock):
         Returns:
             A list of tuples containing the data returned by the database,
                 where each row is a tuple and each column is a value in the tuple.
-        """
+
+        Examples:
+            Repeatedly fetch two rows from the database where address is Highway 42.
+            ```
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+                )
+                conn.execute_many(
+                    "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+                    seq_of_parameters=[
+                        {"name": "Marvin", "address": "Highway 42"},
+                        {"name": "Ford", "address": "Highway 42"},
+                        {"name": "Unknown", "address": "Highway 42"},
+                        {"name": "Me", "address": "Highway 42"},
+                    ],
+                )
+                result = conn.fetch_many(
+                    "SELECT * FROM customers WHERE address = %(address)s",
+                    parameters={"address": "Highway 42"},
+                    size=2
+                )
+                print(result)  # Marvin, Ford
+                result = conn.fetch_many(
+                    "SELECT * FROM customers WHERE address = %(address)s",
+                    parameters={"address": "Highway 42"},
+                    size=2
+                )
+                print(result)  # Unknown, Me
+            ```
+        """  # noqa
         inputs = dict(
             command=operation,
             params=parameters,
@@ -317,7 +390,32 @@ class SnowflakeConnector(DatabaseBlock):
         Returns:
             A list of tuples containing the data returned by the database,
                 where each row is a tuple and each column is a value in the tuple.
-        """
+
+        Examples:
+            Fetch all rows from the database where address is Highway 42.
+            ```
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+                )
+                conn.execute_many(
+                    "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+                    seq_of_parameters=[
+                        {"name": "Marvin", "address": "Highway 42"},
+                        {"name": "Ford", "address": "Highway 42"},
+                        {"name": "Unknown", "address": "Highway 42"},
+                        {"name": "Me", "address": "Myway 88"},
+                    ],
+                )
+                result = conn.fetch_all(
+                    "SELECT * FROM customers WHERE address = %(address)s",
+                    parameters={"address": "Highway 42"},
+                )
+                print(result)  # Marvin, Ford, Unknown
+            ```
+        """  # noqa
         inputs = dict(
             command=operation,
             params=parameters,
@@ -347,7 +445,18 @@ class SnowflakeConnector(DatabaseBlock):
             operation: The SQL query or other operation to be executed.
             parameters: The parameters for the operation.
             **execute_kwargs: Additional options to pass to `cursor.execute_async`.
-        """
+
+        Examples:
+            Create table named customers with two columns, name and address.
+            ```
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+                )
+            ```
+        """  # noqa
         inputs = dict(
             command=operation,
             params=parameters,
@@ -374,31 +483,24 @@ class SnowflakeConnector(DatabaseBlock):
             seq_of_parameters: The sequence of parameters for the operation.
 
         Examples:
-            Create mytable in mydataset and insert two rows into it:
-            ```python
-            from prefect_gcp.Snowflake import SnowflakeWarehouse
-            with SnowflakeWarehouse.load("Snowflake") as warehouse:
-                create_operation = '''
-                CREATE TABLE IF NOT EXISTS mydataset.mytable (
-                    col1 STRING,
-                    col2 INTEGER,
-                    col3 BOOLEAN
+            Create table and insert three rows into it.
+            ```
+            from prefect_snowflake.database import SnowflakeConnector
+
+            with SnowflakeConnector.load("BLOCK_NAME") as conn:
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
                 )
-                '''
-                warehouse.execute(create_operation)
-                insert_operation = '''
-                INSERT INTO mydataset.mytable (col1, col2, col3) VALUES (%s, %s, %s)
-                '''
-                seq_of_parameters = [
-                    ("a", 1, True),
-                    ("b", 2, False),
-                ]
-                warehouse.execute_many(
-                    insert_operation,
-                    seq_of_parameters=seq_of_parameters
+                conn.execute_many(
+                    "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+                    seq_of_parameters=[
+                        {"name": "Marvin", "address": "Highway 42"},
+                        {"name": "Ford", "address": "Highway 42"},
+                        {"name": "Unknown", "address": "Space"},
+                    ],
                 )
             ```
-        """
+        """  # noqa
         inputs = dict(
             command=operation,
             seqparams=seq_of_parameters,
