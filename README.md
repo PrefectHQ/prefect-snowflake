@@ -1,5 +1,7 @@
 # prefect-snowflake
 
+Visit the full docs [here](https://PrefectHQ.github.io/prefect-snowflake) to see additional examples and the API reference.
+
 <p align="center">
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
