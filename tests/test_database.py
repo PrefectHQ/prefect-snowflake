@@ -192,15 +192,19 @@ class TestSnowflakeConnector:
         return connector
 
     def test_block_initialization(self, snowflake_connector):
-        assert snowflake_connector._connection is not None
-        assert snowflake_connector._unique_cursors == {}
+        assert snowflake_connector._connection is None
+        assert snowflake_connector._unique_cursors is None
 
     def test_get_connection(self, snowflake_connector: SnowflakeConnector):
         connection = snowflake_connector.get_connection()
         assert snowflake_connector._connection is connection
 
-    def test_reset_cursors(self, snowflake_connector: SnowflakeConnector):
+    def test_reset_cursors(self, snowflake_connector: SnowflakeConnector, caplog):
         mock_cursor = MagicMock()
+        snowflake_connector.reset_cursors()
+        assert caplog.records[0].msg == "There are no cursors to reset."
+
+        snowflake_connector._start_connection()
         snowflake_connector._unique_cursors["12345"] = mock_cursor
         snowflake_connector.reset_cursors()
         assert len(snowflake_connector._unique_cursors) == 0
@@ -232,12 +236,15 @@ class TestSnowflakeConnector:
         )
 
     def test_close(self, snowflake_connector: SnowflakeConnector):
+        snowflake_connector._start_connection()
         assert snowflake_connector.close() is None
         assert snowflake_connector._connection is None
         assert snowflake_connector._unique_cursors == {}
 
     def test_context_management(self, snowflake_connector):
         with snowflake_connector:
-            pass
+            assert snowflake_connector._connection is None
+            assert snowflake_connector._unique_cursors is None
+
         assert snowflake_connector._connection is None
-        assert snowflake_connector._unique_cursors == {}
+        assert snowflake_connector._unique_cursors is None
