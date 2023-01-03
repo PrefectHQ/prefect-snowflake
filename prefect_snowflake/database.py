@@ -148,6 +148,7 @@ class SnowflakeConnector(DatabaseBlock):
         }
         connection = self.credentials.get_client(**connect_kwargs, **connect_params)
         self._connection = connection
+        self.logger.info("Started a new connection to Snowflake.")
         return connection
 
     def _start_connection(self):

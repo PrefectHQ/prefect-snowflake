@@ -195,9 +195,10 @@ class TestSnowflakeConnector:
         assert snowflake_connector._connection is None
         assert snowflake_connector._unique_cursors is None
 
-    def test_get_connection(self, snowflake_connector: SnowflakeConnector):
+    def test_get_connection(self, snowflake_connector: SnowflakeConnector, caplog):
         connection = snowflake_connector.get_connection()
         assert snowflake_connector._connection is connection
+        assert caplog.records[0].msg == "Started a new connection to Snowflake."
 
     def test_reset_cursors(self, snowflake_connector: SnowflakeConnector, caplog):
         mock_cursor = MagicMock()
