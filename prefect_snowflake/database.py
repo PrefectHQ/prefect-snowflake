@@ -230,7 +230,7 @@ class SnowflakeConnector(DatabaseBlock):
             ```
         """  # noqa
         if not self._unique_cursors:
-            self.logger.info("There are no cursors to reset.")
+            self.logger.info("There were no cursors to reset.")
             return
 
         input_hashes = tuple(self._unique_cursors.keys())
@@ -528,10 +528,12 @@ class SnowflakeConnector(DatabaseBlock):
         try:
             self.reset_cursors()
         finally:
-            if self._connection is not None:
-                self._connection.close()
-                self._connection = None
-        self.logger.info("Successfully closed the Snowflake connection.")
+            if self._connection is None:
+                self.logger.info("There was no connection open to be closed.")
+                return
+            self._connection.close()
+            self._connection = None
+            self.logger.info("Successfully closed the Snowflake connection.")
 
     def __enter__(self):
         """

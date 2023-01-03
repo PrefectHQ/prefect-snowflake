@@ -202,7 +202,7 @@ class TestSnowflakeConnector:
     def test_reset_cursors(self, snowflake_connector: SnowflakeConnector, caplog):
         mock_cursor = MagicMock()
         snowflake_connector.reset_cursors()
-        assert caplog.records[0].msg == "There are no cursors to reset."
+        assert caplog.records[0].msg == "There were no cursors to reset."
 
         snowflake_connector._start_connection()
         snowflake_connector._unique_cursors["12345"] = mock_cursor
@@ -235,7 +235,11 @@ class TestSnowflakeConnector:
             is None
         )
 
-    def test_close(self, snowflake_connector: SnowflakeConnector):
+    def test_close(self, snowflake_connector: SnowflakeConnector, caplog):
+        assert snowflake_connector.close() is None
+        assert caplog.records[0].msg == "There were no cursors to reset."
+        assert caplog.records[1].msg == "There was no connection open to be closed."
+
         snowflake_connector._start_connection()
         assert snowflake_connector.close() is None
         assert snowflake_connector._connection is None
