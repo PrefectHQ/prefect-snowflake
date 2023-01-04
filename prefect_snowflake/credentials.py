@@ -2,6 +2,7 @@
 
 import re
 import warnings
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from cryptography.hazmat.backends import default_backend
@@ -88,8 +89,15 @@ class SnowflakeCredentials(CredentialsBlock):
     private_key: Optional[SecretBytes] = Field(
         default=None, description="The PEM used to authenticate."
     )
+    private_key_path: Optional[Path] = Field(
+        default=None, description="The path to the private key."
+    )
+    private_key_passphrase: Optional[SecretStr] = Field(
+        default=None, description="The password to use for the private key."
+    )
     authenticator: Literal[
         "snowflake",
+        "snowflake_jwt",
         "externalbrowser",
         "okta_endpoint",
         "oauth",
@@ -122,11 +130,26 @@ class SnowflakeCredentials(CredentialsBlock):
         """
         Ensure an authorization value has been provided by the user.
         """
-        auth_params = ("password", "private_key", "authenticator", "token")
+        auth_params = (
+            "password",
+            "private_key",
+            "private_key_path",
+            "authenticator",
+            "token",
+        )
         if not any(values.get(param) for param in auth_params):
             auth_str = ", ".join(auth_params)
             raise ValueError(
                 f"One of the authentication keys must be provided: {auth_str}\n"
+            )
+        elif "private_key" in values and "private_key_path" in values:
+            raise ValueError(
+                "Do not provide both private_key and private_key_path; select one."
+            )
+        elif "password" in values and "private_key_passphrase" in values:
+            raise ValueError(
+                "Do not provide both password and private_key_passphrase; "
+                "specify private_key_passphrase only instead."
             )
         return values
 
@@ -154,7 +177,8 @@ class SnowflakeCredentials(CredentialsBlock):
         # see https://github.com/PrefectHQ/prefect-snowflake/issues/44
         if "okta_endpoint" in values.keys():
             warnings.warn(
-                "Please specify `endpoint` instead of `okta_endpoint`.",
+                "Please specify `endpoint` instead of `okta_endpoint`; "
+                "`okta_endpoint` will be removed March 31, 2023.",
                 DeprecationWarning,
             )
             # remove okta endpoint from fields
@@ -201,9 +225,22 @@ class SnowflakeCredentials(CredentialsBlock):
         if private_key is None:
             return None
 
+        if self.private_key_passphrase is not None:
+            password = self._decode_secret(self.private_key_passphrase)
+        elif self.password is not None:
+            warnings.warn(
+                "Using the password field for private_key is deprecated "
+                "and will not work after March 31, 2023; please use "
+                "private_key_passphrase instead",
+                DeprecationWarning,
+            )
+            password = self._decode_secret(self.password)
+        else:
+            password = None
+
         return load_pem_private_key(
             data=private_key,
-            password=self._decode_secret(self.password),
+            password=password,
             backend=default_backend(),
         ).private_bytes(
             encoding=Encoding.DER,

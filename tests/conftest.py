@@ -72,6 +72,16 @@ def private_credentials_params():
 
 
 @pytest.fixture()
+def private_key_path_credentials_params():
+    return {
+        "account": "account",
+        "user": "user",
+        "private_key_path": "path/to/private/key",
+        "private_key_passphrase": "letmein",
+    }
+
+
+@pytest.fixture()
 def private_connector_params(private_credentials_params):
 
     snowflake_credentials = SnowflakeCredentials(**private_credentials_params)

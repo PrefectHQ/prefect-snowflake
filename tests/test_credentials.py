@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -22,6 +23,21 @@ def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
     credentials_params_missing.pop("password")
     with pytest.raises(ValueError, match="One of the authentication keys"):
         SnowflakeCredentials(**credentials_params_missing)
+
+
+def test_snowflake_credentials_validate_auth_kwargs_private_keys(credentials_params):
+    credentials_params["private_key"] = "key"
+    credentials_params["private_key_path"] = "keypath"
+    with pytest.raises(ValueError, match="Do not provide both private_key and private"):
+        SnowflakeCredentials(**credentials_params)
+
+
+def test_snowflake_credentials_validate_auth_kwargs_private_key_password(
+    credentials_params,
+):
+    credentials_params["private_key_passphrase"] = "key"
+    with pytest.raises(ValueError, match="Do not provide both password and private_"):
+        SnowflakeCredentials(**credentials_params)
 
 
 def test_snowflake_credentials_validate_token_kwargs(credentials_params):
@@ -112,6 +128,22 @@ def test_snowflake_credentials_validate_private_key_password(
     assert credentials.resolve_private_key() is not None
 
 
+def test_snowflake_credentials_validate_private_key_passphrase(
+    private_credentials_params,
+):
+    private_credentials_params[
+        "private_key_passphrase"
+    ] = private_credentials_params.pop("password")
+    credentials_params_missing = private_credentials_params.copy()
+    password = credentials_params_missing.pop("private_key_passphrase")
+    private_key = credentials_params_missing.pop("private_key")
+    assert password == "letmein"
+    assert isinstance(private_key, bytes)
+    # Test cert as string
+    credentials = SnowflakeCredentials(**private_credentials_params)
+    assert credentials.resolve_private_key() is not None
+
+
 def test_snowflake_credentials_validate_private_key_invalid(private_credentials_params):
     credentials_params_missing = private_credentials_params.copy()
     private_key = credentials_params_missing.pop("private_key")
@@ -171,6 +203,21 @@ def test_snowflake_credentials_validate_private_key_is_pem_bytes(
     with pytest.raises(InvalidPemFormat):
         credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
         assert credentials.resolve_private_key() is not None
+
+
+def test_snowflake_credentials_validate_private_key_path_init(
+    private_key_path_credentials_params,
+):
+    snowflake_credentials = SnowflakeCredentials(**private_key_path_credentials_params)
+    actual_credentials_params = snowflake_credentials.dict()
+    for param in private_key_path_credentials_params:
+        actual = actual_credentials_params[param]
+        expected = private_key_path_credentials_params[param]
+        if isinstance(actual, (SecretStr, SecretBytes)):
+            actual = actual.get_secret_value()
+        elif isinstance(actual, Path):
+            actual = str(actual)
+        assert actual == expected
 
 
 def test_get_client(credentials_params, snowflake_connect_mock: MagicMock):

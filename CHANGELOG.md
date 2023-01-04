@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `private_key_path` and `private_key_passphrase` fields to `SnowflakeConnector` - [#59](https://github.com/PrefectHQ/prefect-snowflake/pull/59)
+
 ### Changed
 
 - Do not start connection upon instantiating `SnowflakeConnector` until its methods are called - [#58](https://github.com/PrefectHQ/prefect-snowflake/pull/58)
 
 ### Deprecated
+
+- `password` in favor of `private_key_passphrase` field in `SnowflakeConnector` - [#59](https://github.com/PrefectHQ/prefect-snowflake/pull/59)
 
 ### Removed
 
