@@ -147,19 +147,15 @@ class SnowflakeConnector(DatabaseBlock):
             "schema": self.schema_,
         }
         connection = self.credentials.get_client(**connect_kwargs, **connect_params)
+        self._connection = connection
+        self.logger.info("Started a new connection to Snowflake.")
         return connection
 
     def _start_connection(self):
         """
         Starts Snowflake database connection.
         """
-        self._connection = self.get_connection()
-
-    def block_initialization(self) -> None:
-        super().block_initialization()
-        if self._connection is None:
-            self._start_connection()
-
+        self.get_connection()
         if self._unique_cursors is None:
             self._unique_cursors = {}
 
@@ -174,6 +170,8 @@ class SnowflakeConnector(DatabaseBlock):
         Returns:
             Whether a cursor is new and a Snowflake cursor.
         """
+        self._start_connection()
+
         input_hash = hash_objects(inputs)
         if input_hash is None:
             raise RuntimeError(
@@ -232,6 +230,10 @@ class SnowflakeConnector(DatabaseBlock):
                 print(conn.fetch_one("SELECT * FROM customers"))  # should be Ford again
             ```
         """  # noqa
+        if not self._unique_cursors:
+            self.logger.info("There were no cursors to reset.")
+            return
+
         input_hashes = tuple(self._unique_cursors.keys())
         for input_hash in input_hashes:
             cursor = self._unique_cursors.pop(input_hash)
@@ -462,6 +464,8 @@ class SnowflakeConnector(DatabaseBlock):
                 )
             ```
         """  # noqa
+        self._start_connection()
+
         inputs = dict(
             command=operation,
             params=parameters,
@@ -506,6 +510,8 @@ class SnowflakeConnector(DatabaseBlock):
                 )
             ```
         """  # noqa
+        self._start_connection()
+
         inputs = dict(
             command=operation,
             seqparams=seq_of_parameters,
@@ -523,10 +529,12 @@ class SnowflakeConnector(DatabaseBlock):
         try:
             self.reset_cursors()
         finally:
-            if self._connection is not None:
-                self._connection.close()
-                self._connection = None
-        self.logger.info("Successfully closed the Snowflake connection.")
+            if self._connection is None:
+                self.logger.info("There was no connection open to be closed.")
+                return
+            self._connection.close()
+            self._connection = None
+            self.logger.info("Successfully closed the Snowflake connection.")
 
     def __enter__(self):
         """
@@ -549,7 +557,6 @@ class SnowflakeConnector(DatabaseBlock):
     def __setstate__(self, data: dict):
         """Reset connection and cursors upon loading."""
         self.__dict__.update(data)
-        self._unique_cursors = {}
         self._start_connection()
 
 
