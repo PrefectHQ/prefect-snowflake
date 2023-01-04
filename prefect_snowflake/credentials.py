@@ -142,6 +142,15 @@ class SnowflakeCredentials(CredentialsBlock):
             raise ValueError(
                 f"One of the authentication keys must be provided: {auth_str}\n"
             )
+        elif "private_key" in values and "private_key_path" in values:
+            raise ValueError(
+                "Do not provide both private_key and private_key_path; select one."
+            )
+        elif "password" in values and "private_key_passphrase" in values:
+            raise ValueError(
+                "Do not provide both password and private_key_passphrase; "
+                "specify private_key_passphrase only instead."
+            )
         return values
 
     @root_validator(pre=True)

@@ -25,6 +25,21 @@ def test_snowflake_credentials_validate_auth_kwargs(credentials_params):
         SnowflakeCredentials(**credentials_params_missing)
 
 
+def test_snowflake_credentials_validate_auth_kwargs_private_keys(credentials_params):
+    credentials_params["private_key"] = "key"
+    credentials_params["private_key_path"] = "keypath"
+    with pytest.raises(ValueError, match="Do not provide both private_key and private"):
+        SnowflakeCredentials(**credentials_params)
+
+
+def test_snowflake_credentials_validate_auth_kwargs_private_key_password(
+    credentials_params,
+):
+    credentials_params["private_key_passphrase"] = "key"
+    with pytest.raises(ValueError, match="Do not provide both password and private_"):
+        SnowflakeCredentials(**credentials_params)
+
+
 def test_snowflake_credentials_validate_token_kwargs(credentials_params):
     credentials_params_missing = credentials_params.copy()
     credentials_params_missing.pop("password")
