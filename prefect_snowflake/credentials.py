@@ -169,7 +169,7 @@ class SnowflakeCredentials(CredentialsBlock):
         if "okta_endpoint" in values.keys():
             warnings.warn(
                 "Please specify `endpoint` instead of `okta_endpoint`; "
-                "`endpoint` will be removed March 31, 2023.",
+                "`okta_endpoint` will be removed March 31, 2023.",
                 DeprecationWarning,
             )
             # remove okta endpoint from fields
