@@ -230,7 +230,7 @@ class SnowflakeCredentials(CredentialsBlock):
         elif self.password is not None:
             warnings.warn(
                 "Using the password field for private_key is deprecated "
-                "and will be removed March 31, 2023; please use "
+                "and will not work after March 31, 2023; please use "
                 "private_key_passphrase instead",
                 DeprecationWarning,
             )
