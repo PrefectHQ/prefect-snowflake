@@ -2,9 +2,14 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from prefect import flow
 from pydantic import SecretBytes, SecretStr
 
-from prefect_snowflake.credentials import InvalidPemFormat, SnowflakeCredentials
+from prefect_snowflake.credentials import (
+    InvalidPemFormat,
+    SnowflakeConnector,
+    SnowflakeCredentials,
+)
 
 
 def test_snowflake_credentials_init(credentials_params):
@@ -314,3 +319,24 @@ def test_snowflake_credentials_encrypted_private_key_is_valid(
     assert snowflake_credentials.password is not None
     # Raises error if invalid
     snowflake_credentials.get_client()
+
+
+def test_snowflake_private_key_flow():
+    """
+    https://github.com/PrefectHQ/prefect-snowflake/issues/62
+    """
+
+    @flow
+    def snowflake_query_flow():
+        snowflake_credentials = SnowflakeCredentials(
+            account="account", user="user", password="password", role="MY_ROLE"
+        )
+        snowflake_connector = SnowflakeConnector(
+            database="database",
+            warehouse="warehouse",
+            schema="schema",
+            credentials=snowflake_credentials,
+        )
+        return snowflake_connector
+
+    snowflake_query_flow()

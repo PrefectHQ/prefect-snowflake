@@ -137,16 +137,17 @@ class SnowflakeCredentials(CredentialsBlock):
             "authenticator",
             "token",
         )
+        print(values)
         if not any(values.get(param) for param in auth_params):
             auth_str = ", ".join(auth_params)
             raise ValueError(
                 f"One of the authentication keys must be provided: {auth_str}\n"
             )
-        elif "private_key" in values and "private_key_path" in values:
+        elif values.get("private_key") and values.get("private_key_path"):
             raise ValueError(
                 "Do not provide both private_key and private_key_path; select one."
             )
-        elif "password" in values and "private_key_passphrase" in values:
+        elif values.get("password") and values.get("private_key_passphrase"):
             raise ValueError(
                 "Do not provide both password and private_key_passphrase; "
                 "specify private_key_passphrase only instead."
