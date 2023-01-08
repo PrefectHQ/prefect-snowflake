@@ -137,7 +137,6 @@ class SnowflakeCredentials(CredentialsBlock):
             "authenticator",
             "token",
         )
-        print(values)
         if not any(values.get(param) for param in auth_params):
             auth_str = ", ".join(auth_params)
             raise ValueError(

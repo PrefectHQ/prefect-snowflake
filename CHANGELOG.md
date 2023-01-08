@@ -19,13 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## 0.2.5
+## 0.2.6
+
+Released on January 9th, 2022.
+
+### Fixed
+
+- Improper validation of `private_key_path` and `private_key_passphrase` fields to `SnowflakeCredentials` - [#59](https://github.com/PrefectHQ/prefect-snowflake/pull/59)
+
+## 0.25
 
 Released on January 4th, 2022.
 
 ### Added
 
-- `private_key_path` and `private_key_passphrase` fields to `SnowflakeConnector` - [#59](https://github.com/PrefectHQ/prefect-snowflake/pull/59)
+- `private_key_path` and `private_key_passphrase` fields to `SnowflakeCredentials` - [#59](https://github.com/PrefectHQ/prefect-snowflake/pull/59)
 
 ### Changed
 
