@@ -2,9 +2,11 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from prefect import flow
 from pydantic import SecretBytes, SecretStr
 
 from prefect_snowflake.credentials import InvalidPemFormat, SnowflakeCredentials
+from prefect_snowflake.database import SnowflakeConnector
 
 
 def test_snowflake_credentials_init(credentials_params):
@@ -314,3 +316,63 @@ def test_snowflake_credentials_encrypted_private_key_is_valid(
     assert snowflake_credentials.password is not None
     # Raises error if invalid
     snowflake_credentials.get_client()
+
+
+def test_snowflake_with_no_private_key_flow():
+    """
+    https://github.com/PrefectHQ/prefect-snowflake/issues/62
+    """
+
+    @flow
+    def snowflake_query_flow():
+        snowflake_credentials = SnowflakeCredentials(
+            account="account", user="user", password="password", role="MY_ROLE"
+        )
+        snowflake_connector = SnowflakeConnector(
+            database="database",
+            warehouse="warehouse",
+            schema="schema",
+            credentials=snowflake_credentials,
+        )
+        return snowflake_connector
+
+    snowflake_connector = snowflake_query_flow()
+    assert isinstance(snowflake_connector, SnowflakeConnector)
+    assert isinstance(snowflake_connector.credentials, SnowflakeCredentials)
+    assert snowflake_connector.credentials.private_key is None
+    assert snowflake_connector.credentials.private_key_path is None
+    assert snowflake_connector.credentials.private_key_passphrase is None
+    assert snowflake_connector.credentials.password.get_secret_value() == "password"
+
+
+def test_snowflake_with_private_key_path_flow():
+    """
+    https://github.com/PrefectHQ/prefect-snowflake/issues/62
+    """
+
+    @flow
+    def snowflake_query_flow():
+        snowflake_credentials = SnowflakeCredentials(
+            account="account",
+            user="user",
+            private_key_path="private_key_path",
+            private_key_passphrase="passphrase",
+        )
+        snowflake_connector = SnowflakeConnector(
+            database="database",
+            warehouse="warehouse",
+            schema="schema",
+            credentials=snowflake_credentials,
+        )
+        return snowflake_connector
+
+    snowflake_connector = snowflake_query_flow()
+    assert isinstance(snowflake_connector, SnowflakeConnector)
+    assert isinstance(snowflake_connector.credentials, SnowflakeCredentials)
+    assert snowflake_connector.credentials.private_key is None
+    assert snowflake_connector.credentials.private_key_path == Path("private_key_path")
+    assert (
+        snowflake_connector.credentials.private_key_passphrase.get_secret_value()
+        == "passphrase"
+    )
+    assert snowflake_connector.credentials.password is None
