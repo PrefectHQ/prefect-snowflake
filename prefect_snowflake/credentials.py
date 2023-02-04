@@ -78,6 +78,7 @@ class SnowflakeCredentials(CredentialsBlock):
 
     _block_type_name = "Snowflake Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2DxzAeTM9eHLDcRQx1FR34/f858a501cdff918d398b39365ec2150f/snowflake.png?h=250"  # noqa
+    _documentation_url = "https://prefecthq.github.io/prefect-snowflake/credentials/#prefect_snowflake.credentials.SnowflakeCredentials"  # noqa
 
     account: str = Field(
         ..., description="The snowflake account name.", example="nh12345.us-east-2.aws"
