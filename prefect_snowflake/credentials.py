@@ -20,14 +20,7 @@ except ImportError:
 
 import snowflake.connector
 from prefect.blocks.abstract import CredentialsBlock
-from pydantic import (
-    Field,
-    SecretBytes,
-    SecretField,
-    SecretStr,
-    root_validator,
-    validator,
-)
+from pydantic import Field, SecretBytes, SecretField, SecretStr, root_validator
 
 # PEM certificates have the pattern:
 #   -----BEGIN PRIVATE KEY-----
@@ -194,21 +187,6 @@ class SnowflakeCredentials(CredentialsBlock):
             )
         return values
 
-    @validator("private_key")
-    def _validate_private_key(cls, private_key):
-        """
-        Ensure a private_key looks like a PEM format certificate.
-        """
-
-        if private_key is None:
-            return None
-
-        assert isinstance(private_key, SecretBytes)
-
-        pk = cls._decode_secret(private_key)
-
-        return None if pk is None else SecretBytes(cls._compose_pem(pk))
-
     def resolve_private_key(self) -> Optional[bytes]:
         """
         Converts a PEM encoded private key into a DER binary key.
@@ -219,11 +197,13 @@ class SnowflakeCredentials(CredentialsBlock):
         Raises:
             InvalidPemFormat: If private key is not in PEM format.
         """
-
-        private_key = self._decode_secret(self.private_key)
-
-        if private_key is None:
+        if self.private_key_path is None and self.private_key is None:
             return None
+        elif self.private_key_path:
+            private_key = self._compose_pem(self.private_key_path.read_bytes())
+        else:
+            private_key = self._decode_secret(self.private_key)
+        composed_private_key = self._compose_pem(private_key)
 
         if self.private_key_passphrase is not None:
             password = self._decode_secret(self.private_key_passphrase)
@@ -239,7 +219,7 @@ class SnowflakeCredentials(CredentialsBlock):
             password = None
 
         return load_pem_private_key(
-            data=private_key,
+            data=composed_private_key,
             password=password,
             backend=default_backend(),
         ).private_bytes(
@@ -353,5 +333,6 @@ class SnowflakeCredentials(CredentialsBlock):
         if private_der_key is not None:
             connect_params["private_key"] = private_der_key
             connect_params.pop("password", None)
+            connect_params.pop("private_key_passphrase", None)
 
         return snowflake.connector.connect(**connect_params)
