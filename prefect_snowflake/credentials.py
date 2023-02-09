@@ -173,6 +173,7 @@ class SnowflakeCredentials(CredentialsBlock):
                 "Please specify `endpoint` instead of `okta_endpoint`; "
                 "`okta_endpoint` will be removed March 31, 2023.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             # remove okta endpoint from fields
             okta_endpoint = values.pop("okta_endpoint")
@@ -203,7 +204,6 @@ class SnowflakeCredentials(CredentialsBlock):
             private_key = self.private_key_path.read_bytes()
         else:
             private_key = self._decode_secret(self.private_key)
-        composed_private_key = self._compose_pem(private_key)
 
         if self.private_key_passphrase is not None:
             password = self._decode_secret(self.private_key_passphrase)
@@ -213,11 +213,13 @@ class SnowflakeCredentials(CredentialsBlock):
                 "and will not work after March 31, 2023; please use "
                 "private_key_passphrase instead",
                 DeprecationWarning,
+                stacklevel=2,
             )
             password = self._decode_secret(self.password)
         else:
             password = None
 
+        composed_private_key = self._compose_pem(private_key)
         return load_pem_private_key(
             data=composed_private_key,
             password=password,
