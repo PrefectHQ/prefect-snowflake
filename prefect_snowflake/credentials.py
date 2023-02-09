@@ -200,7 +200,7 @@ class SnowflakeCredentials(CredentialsBlock):
         if self.private_key_path is None and self.private_key is None:
             return None
         elif self.private_key_path:
-            private_key = self._compose_pem(self.private_key_path.read_bytes())
+            private_key = self.private_key_path.read_bytes()
         else:
             private_key = self._decode_secret(self.private_key)
         composed_private_key = self._compose_pem(private_key)
