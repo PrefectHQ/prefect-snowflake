@@ -1,0 +1,26 @@
+diff a/mkdocs.yml b/mkdocs.yml	(rejected hunks)
+@@ -64,8 +72,14 @@ watch:
+ 
+ nav:
+     - Home: index.md
+-    - Tasks: tasks.md
+-    - Flows: flows.mdextra:
++    - Blocks Catalog: blocks_catalog.md
++    - Examples Catalog: examples_catalog.md
++    - API Reference:
++        - Tasks: tasks.md
++        - Flows: flows.md
++
++
++extra:
+     social:
+         - icon: fontawesome/brands/slack
+           link: https://www.prefect.io/slack/
+@@ -85,3 +99,7 @@ nav:
+           link: https://hub.docker.com/r/prefecthq/prefect/
+         - icon: fontawesome/brands/python
+           link: https://pypi.org/project/prefect/
++    analytics:
++        provider: google
++        property: G-8CSMBCQDKN
++

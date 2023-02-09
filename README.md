@@ -1,8 +1,8 @@
 # prefect-snowflake
 
-Visit the full docs [here](https://PrefectHQ.github.io/prefect-snowflake) to see additional examples and the API reference.
-
 <p align="center">
+    <!--- Insert a cover image here -->
+    <!--- <br> -->
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
@@ -156,7 +156,7 @@ If you have any questions or issues while using `prefect-snowflake`, you can fin
 
 Feel free to star or watch [`prefect-snowflake`](https://github.com/PrefectHQ/prefect-snowflake) for updates too!
 
-## Contributing
+### Contributing
 
 If you'd like to help contribute to fix an issue or add a feature to `prefect-snowflake`, please [propose changes through a pull request from a fork of the repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
 
