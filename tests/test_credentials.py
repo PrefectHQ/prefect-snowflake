@@ -99,12 +99,6 @@ def test_snowflake_private_credentials_init(private_credentials_params):
         assert actual == expected
 
 
-def test_snowflake_private_credentials_invalid_certificate(private_credentials_params):
-    private_credentials_params["private_key"] = "---- INVALID CERTIFICATE ----"
-    with pytest.raises(InvalidPemFormat):
-        SnowflakeCredentials(**private_credentials_params)
-
-
 def test_snowflake_private_credentials_malformed_certificate(
     private_credentials_params, private_malformed_credentials_params
 ):
@@ -115,6 +109,12 @@ def test_snowflake_private_credentials_malformed_certificate(
     assert isinstance(c1, bytes)
     assert isinstance(c2, bytes)
     assert c1 == c2
+
+
+def test_snowflake_private_credentials_invalid_certificate(private_credentials_params):
+    private_credentials_params["private_key"] = "---- INVALID CERTIFICATE ----"
+    with pytest.raises(InvalidPemFormat):
+        SnowflakeCredentials(**private_credentials_params).resolve_private_key()
 
 
 def test_snowflake_credentials_validate_private_key_password(
@@ -142,6 +142,19 @@ def test_snowflake_credentials_validate_private_key_passphrase(
     assert password == "letmein"
     assert isinstance(private_key, bytes)
     # Test cert as string
+    credentials = SnowflakeCredentials(**private_credentials_params)
+    assert credentials.resolve_private_key() is not None
+
+
+def test_snowflake_credentials_validate_private_key_path(
+    private_credentials_params, tmp_path
+):
+    private_key_path = tmp_path / "private_key.pem"
+    private_key_path.write_bytes(private_credentials_params.pop("private_key"))
+    private_credentials_params["private_key_path"] = private_key_path
+    private_credentials_params[
+        "private_key_passphrase"
+    ] = private_credentials_params.pop("password")
     credentials = SnowflakeCredentials(**private_credentials_params)
     assert credentials.resolve_private_key() is not None
 
