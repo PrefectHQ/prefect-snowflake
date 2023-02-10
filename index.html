@@ -12,10 +12,10 @@
       
       
       
-        <link rel="next" href="credentials/">
+        <link rel="next" href="blocks_catalog/">
       
       <link rel="icon" href="img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -305,70 +305,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#python-setup" class="md-nav__link">
-    Python setup
+  <a href="#integrate-with-prefect-flows" class="md-nav__link">
+    Integrate with Prefect flows
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#query-from-table" class="md-nav__link">
-    Query from table
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write-pandas-to-table-using-block-attributes" class="md-nav__link">
-    Write pandas to table using block attributes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#execute-get-and-put-statements" class="md-nav__link">
-    Execute get and put statements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-with_options-to-customize-options-on-any-existing-task-or-flow" class="md-nav__link">
-    Use with_options to customize options on any existing task or flow:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#blocks-catalog" class="md-nav__link">
-    Blocks Catalog
-  </a>
-  
-    <nav class="md-nav" aria-label="Blocks Catalog">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#credentials-module" class="md-nav__link">
-    Credentials Module
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#database-module" class="md-nav__link">
-    Database Module
+  <a href="#access-underlying-snowflake-connection" class="md-nav__link">
+    Access underlying Snowflake connection
   </a>
   
 </li>
@@ -383,12 +328,39 @@
     Resources
   </a>
   
+    <nav class="md-nav" aria-label="Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#saving-credentials-to-block" class="md-nav__link">
+    Saving credentials to block
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feedback" class="md-nav__link">
+    Feedback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     Contributing
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -408,8 +380,8 @@
   
   
     <li class="md-nav__item">
-      <a href="credentials/" class="md-nav__link">
-        Credentials
+      <a href="blocks_catalog/" class="md-nav__link">
+        Blocks Catalog
       </a>
     </li>
   
@@ -423,9 +395,72 @@
   
   
     <li class="md-nav__item">
+      <a href="examples_catalog/" class="md-nav__link">
+        Examples Catalog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          API Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          API Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="credentials/" class="md-nav__link">
+        Credentials
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="database/" class="md-nav__link">
         Database
       </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -472,70 +507,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#python-setup" class="md-nav__link">
-    Python setup
+  <a href="#integrate-with-prefect-flows" class="md-nav__link">
+    Integrate with Prefect flows
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#query-from-table" class="md-nav__link">
-    Query from table
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write-pandas-to-table-using-block-attributes" class="md-nav__link">
-    Write pandas to table using block attributes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#execute-get-and-put-statements" class="md-nav__link">
-    Execute get and put statements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-with_options-to-customize-options-on-any-existing-task-or-flow" class="md-nav__link">
-    Use with_options to customize options on any existing task or flow:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#blocks-catalog" class="md-nav__link">
-    Blocks Catalog
-  </a>
-  
-    <nav class="md-nav" aria-label="Blocks Catalog">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#credentials-module" class="md-nav__link">
-    Credentials Module
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#database-module" class="md-nav__link">
-    Database Module
+  <a href="#access-underlying-snowflake-connection" class="md-nav__link">
+    Access underlying Snowflake connection
   </a>
   
 </li>
@@ -550,12 +530,39 @@
     Resources
   </a>
   
+    <nav class="md-nav" aria-label="Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#saving-credentials-to-block" class="md-nav__link">
+    Saving credentials to block
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feedback" class="md-nav__link">
+    Feedback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     Contributing
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -580,6 +587,8 @@
 
 <h1 id="prefect-snowflake">prefect-snowflake</h1>
 <p align="center">
+    <img src="https://user-images.githubusercontent.com/15331990/217983397-036ddfd1-22c4-4113-8045-d5d9e43b963c.png">
+    <br>
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
@@ -596,150 +605,196 @@
 </p>
 
 <h2 id="welcome">Welcome!</h2>
-<p>Prefect integrations for interacting with prefect-snowflake.</p>
+<p>The prefect-snowflake collection makes it easy to connect to a Snowflake database in your Prefect flows. Check out the examples below to get started!</p>
 <h2 id="getting-started">Getting Started</h2>
-<h3 id="python-setup">Python setup</h3>
-<p>Requires an installation of Python 3.7+.</p>
-<p>We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.</p>
-<p>These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
-<h3 id="installation">Installation</h3>
-<p>Install <code>prefect-snowflake</code> with <code>pip</code>:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>prefect-snowflake
-</code></pre></div>
-<p>A list of available blocks in <code>prefect-snowflake</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-snowflake/#blocks-catalog">here</a>.</p>
-<h3 id="query-from-table">Query from table</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span><span class="p">,</span> <span class="n">snowflake_query</span>
+<h3 id="integrate-with-prefect-flows">Integrate with Prefect flows</h3>
+<p>Prefect works with Snowflake by providing dataflow automation for faster, more efficient data pipeline creation, execution, and monitoring.</p>
+<p>This results in reduced errors, increased confidence in your data, and ultimately, faster insights.</p>
+<p>To set up a table, use the <code>execute</code> and <code>execute_many</code> methods. Then, use the <code>fetch_many</code> method to retrieve data in a stream until there's no more data.</p>
+<p>By using the <code>SnowflakeConnector</code> as a context manager, you can make sure that the Snowflake connection and cursors are closed properly after you're done with them.</p>
+<p>Be sure to install <a href="#installation">prefect-snowflake</a> and <a href="#saving-credentials-to-block">save to block</a> to run the examples below!</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sync</label><label for="__tabbed_1_2">Async</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span><span class="p">,</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 
+
+<span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">setup_table</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">connector</span><span class="p">:</span>
+        <span class="n">connector</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);&quot;</span>
+        <span class="p">)</span>
+        <span class="n">connector</span><span class="o">.</span><span class="n">execute_many</span><span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO customers (name, address) VALUES (</span><span class="si">%(name)s</span><span class="s2">, </span><span class="si">%(address)s</span><span class="s2">);&quot;</span><span class="p">,</span>
+            <span class="n">seq_of_parameters</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ford&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Me&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Myway 88&quot;</span><span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+<span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">fetch_data</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="n">all_rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">connector</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># Repeated fetch* calls using the same operation will</span>
+            <span class="c1"># skip re-executing and instead return the next set of results</span>
+            <span class="n">new_rows</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">fetch_many</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM customers&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">all_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rows</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_rows</span>
 
 <span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">snowflake_query_flow</span><span class="p">():</span>
-    <span class="n">snowflake_credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="p">(</span>
-        <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account&quot;</span><span class="p">,</span>
-        <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
-        <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
-        <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
-        <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span>
-        <span class="n">credentials</span><span class="o">=</span><span class="n">snowflake_credentials</span>
-    <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">snowflake_query</span><span class="p">(</span>
-        <span class="s2">&quot;SELECT * FROM table WHERE id=%</span><span class="si">{id_param}</span><span class="s2">s LIMIT 8;&quot;</span><span class="p">,</span>
-        <span class="n">snowflake_connector</span><span class="p">,</span>
-        <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id_param&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span>
+<span class="k">def</span> <span class="nf">snowflake_flow</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="n">setup_table</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+    <span class="n">all_rows</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_rows</span>
 
-<span class="n">snowflake_query_flow</span><span class="p">()</span>
+<span class="n">snowflake_flow</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="write-pandas-to-table-using-block-attributes">Write pandas to table using block attributes</h3>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span><span class="p">,</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="nd">@task</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">setup_table</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">with</span> <span class="k">await</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">connector</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">connector</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);&quot;</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="n">connector</span><span class="o">.</span><span class="n">execute_many</span><span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO customers (name, address) VALUES (</span><span class="si">%(name)s</span><span class="s2">, </span><span class="si">%(address)s</span><span class="s2">);&quot;</span><span class="p">,</span>
+            <span class="n">seq_of_parameters</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ford&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Me&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Myway 88&quot;</span><span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+<span class="nd">@task</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_data</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="n">all_rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="k">await</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">connector</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># Repeated fetch* calls using the same operation will</span>
+            <span class="c1"># skip re-executing and instead return the next set of results</span>
+            <span class="n">new_rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">connector</span><span class="o">.</span><span class="n">fetch_many</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM customers&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">all_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rows</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_rows</span>
+
+<span class="nd">@flow</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">snowflake_flow</span><span class="p">(</span><span class="n">block_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">setup_table</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+    <span class="n">all_rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_rows</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">snowflake_flow</span><span class="p">(</span><span class="s2">&quot;example&quot;</span><span class="p">))</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="access-underlying-snowflake-connection">Access underlying Snowflake connection</h3>
+<p>If the native methods of the block don't meet your requirements, don't worry.</p>
+<p>You have the option to access the underlying Snowflake connection and utilize its built-in methods as well.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span><span class="p">,</span> <span class="n">snowflake_query</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 <span class="kn">from</span> <span class="nn">snowflake.connector.pandas_tools</span> <span class="kn">import</span> <span class="n">write_pandas</span>
 
 <span class="nd">@flow</span>
 <span class="k">def</span> <span class="nf">snowflake_write_pandas_flow</span><span class="p">():</span>
-    <span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">snowflake_connector</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="n">connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
         <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;TABLE_NAME&quot;</span>
         <span class="n">ddl</span> <span class="o">=</span> <span class="s2">&quot;NAME STRING, NUMBER INT&quot;</span>
         <span class="n">statement</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;CREATE TABLE IF NOT EXISTS </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">ddl</span><span class="si">}</span><span class="s1">)&#39;</span>
-        <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
-            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">connector</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
 
         <span class="c1"># case sensitivity matters here!</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([(</span><span class="s1">&#39;Marvin&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Ford&#39;</span><span class="p">,</span> <span class="mi">88</span><span class="p">)],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;NUMBER&#39;</span><span class="p">])</span>
         <span class="n">success</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">write_pandas</span><span class="p">(</span>
-            <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span>
+            <span class="n">conn</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">database</span><span class="o">=</span><span class="n">snowflake_connector</span><span class="o">.</span><span class="n">database</span><span class="p">,</span>
             <span class="n">schema</span><span class="o">=</span><span class="n">snowflake_connector</span><span class="o">.</span><span class="n">schema_</span>  <span class="c1"># note the &quot;_&quot; suffix</span>
         <span class="p">)</span>
 </code></pre></div>
-<h3 id="execute-get-and-put-statements">Execute <code>get</code> and <code>put</code> statements</h3>
-<p>To execute <code>get</code> and <code>put</code> statements, use <code>snowflake_query_sync</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span><span class="p">,</span> <span class="n">snowflake_query_sync</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">snowflake_put_file_to_snowflake_stage</span><span class="p">():</span>
-    <span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block&quot;</span><span class="p">)</span>
-
-    <span class="n">snowflake_query_sync</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;put file:///myfolder/myfile @mystage/mystagepath&quot;</span><span class="p">,</span>
-        <span class="n">snowflake_connector</span><span class="o">=</span><span class="n">snowflake_connector</span>
-    <span class="p">)</span>
-</code></pre></div>
-<h3 id="use-with_options-to-customize-options-on-any-existing-task-or-flow">Use <code>with_options</code> to customize options on any existing task or flow:</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span><span class="p">,</span> <span class="n">snowflake_query_sync</span>
-
-<span class="n">custom_snowflake_query_sync</span> <span class="o">=</span> <span class="n">snowflake_query_sync</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;My custom task name&quot;</span><span class="p">,</span>
-    <span class="n">retries</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">retry_delay_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">example_with_options_flow</span><span class="p">():</span>
-<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my-block&quot;</span><span class="p">)</span>
-
-<span class="n">custom_snowflake_query_sync</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">&quot;put file:///myfolder/myfile @mystage/mystagepath&quot;</span><span class="p">,</span>
-    <span class="n">snowflake_connector</span><span class="o">=</span><span class="n">snowflake_connector</span>
-<span class="p">)</span>
-
-<span class="n">example_with_options_flow</span><span class="p">()</span>
-</code></pre></div>
+<h2 id="resources">Resources</h2>
 <p>For more tips on how to use tasks and flows in a Collection, check out <a href="https://orion-docs.prefect.io/collections/usage/">Using Collections</a>!</p>
-<h2 id="blocks-catalog">Blocks Catalog</h2>
-<p>Below is a list of Blocks available for registration in
-<code>prefect-snowflake</code>.</p>
-<p>To register blocks in this module to
+<h3 id="installation">Installation</h3>
+<p>Install <code>prefect-snowflake</code> with <code>pip</code>:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>prefect-snowflake
+</code></pre></div>
+<p>A list of available blocks in <code>prefect-snowflake</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-snowflake/blocks_catalog">here</a>.</p>
+<p>Requires an installation of Python 3.7+.</p>
+<p>We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.</p>
+<p>These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
+<h3 id="saving-credentials-to-block">Saving credentials to block</h3>
+<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<p>Below is a walkthrough on saving a <code>SnowflakeCredentials</code> block through code.</p>
+<ol>
+<li>Head over to https://app.snowflake.com/.</li>
+<li>Login to your Snowflake account, e.g. nh12345.us-east-2.aws, with your username and password.</li>
+<li>Use those credentials to fill replace the placeholders below.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
+
+<span class="n">credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="p">(</span>
+    <span class="n">account</span><span class="o">=</span><span class="s2">&quot;ACCOUNT-PLACEHOLDER&quot;</span><span class="p">,</span>  <span class="c1"># resembles nh12345.us-east-2.aws</span>
+    <span class="n">user</span><span class="o">=</span><span class="s2">&quot;USER-PLACEHOLDER&quot;</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;PASSWORD-PLACEHOLDER&quot;</span>
+<span class="p">)</span>
+<span class="n">credentials</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;CREDENTIALS-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Then, to create a <code>SnowflakeConnector</code> block:</p>
+<ol>
+<li>After logging in, click on any worksheet.</li>
+<li>On the left side, select a database and schema.</li>
+<li>On the top right, select a warehouse.</li>
+<li>Create a short script, replacing the placeholders below.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span><span class="p">,</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;CREDENTIALS-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+
+<span class="n">connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
+    <span class="n">credentials</span><span class="o">=</span><span class="n">credentials</span><span class="p">,</span>
+    <span class="n">database</span><span class="o">=</span><span class="s2">&quot;DATABASE-PLACEHOLDER&quot;</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;SCHEMA-PLACEHOLDER&quot;</span><span class="p">,</span>
+    <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;COMPUTE_WH&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">connector</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;CONNECTOR-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Congrats! You can now easily load the saved block, which holds your credentials and connection info:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span><span class="p">,</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">SnowflakeCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;CREDENTIALS-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+<span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;CONNECTOR-BLOCK-NAME-PLACEHOLDER&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Registering blocks</p>
+<p>Register blocks in this module to
 <a href="https://orion-docs.prefect.io/ui/blocks/">view and edit them</a>
-on Prefect Cloud:
+on Prefect Cloud:</p>
 <div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_snowflake
 </code></pre></div>
-Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
-<h3 id="credentials-module">Credentials Module</h3>
-<ul>
-<li><strong><a class="autorefs autorefs-internal" href="credentials/#prefect_snowflake.credentials.SnowflakeCredentials">SnowflakeCredentials</a></strong></li>
-</ul>
-<p>To load the SnowflakeCredentials:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
-    <span class="n">my_block</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
-
-<span class="n">my_flow</span><span class="p">()</span>
-</code></pre></div></p>
-<h3 id="database-module">Database Module</h3>
-<ul>
-<li><strong><a class="autorefs autorefs-internal" href="database/#prefect_snowflake.database.SnowflakeConnector">SnowflakeConnector</a></strong></li>
-</ul>
-<p>To load the SnowflakeConnector:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="nd">@flow</span>
-<span class="k">def</span> <span class="nf">my_flow</span><span class="p">():</span>
-    <span class="n">my_block</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;MY_BLOCK_NAME&quot;</span><span class="p">)</span>
-
-<span class="n">my_flow</span><span class="p">()</span>
-</code></pre></div></p>
-<h2 id="resources">Resources</h2>
+</div>
+<p>A list of available blocks in <code>prefect-snowflake</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-snowflake/blocks_catalog">here</a>.</p>
+<h3 id="feedback">Feedback</h3>
 <p>If you encounter any bugs while using <code>prefect-snowflake</code>, feel free to open an issue in the <a href="https://github.com/PrefectHQ/prefect-snowflake">prefect-snowflake</a> repository.</p>
 <p>If you have any questions or issues while using <code>prefect-snowflake</code>, you can find help in either the <a href="https://discourse.prefect.io/">Prefect Discourse forum</a> or the <a href="https://prefect.io/slack">Prefect Slack community</a>.</p>
 <p>Feel free to star or watch <a href="https://github.com/PrefectHQ/prefect-snowflake"><code>prefect-snowflake</code></a> for updates too!</p>
-<h2 id="contributing">Contributing</h2>
+<h3 id="contributing">Contributing</h3>
 <p>If you'd like to help contribute to fix an issue or add a feature to <code>prefect-snowflake</code>, please <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork">propose changes through a pull request from a fork of the repository</a>.</p>
 <p>Here are the steps:</p>
 <ol>
@@ -898,10 +953,10 @@ Note, to use the <code>load</code> method on Blocks, you must already have a blo
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>
