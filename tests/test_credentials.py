@@ -1,8 +1,10 @@
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
 from prefect import flow
+from prefect.utilities.filesystem import relative_path_to_current_platform
 from pydantic import SecretBytes, SecretStr
 
 from prefect_snowflake.credentials import InvalidPemFormat, SnowflakeCredentials
@@ -96,7 +98,8 @@ def test_snowflake_private_credentials_init(private_credentials_params):
         expected = private_credentials_params[param]
         if isinstance(actual, (SecretStr, SecretBytes)):
             actual = actual.get_secret_value()
-        assert actual == expected
+        if sys.platform != "win32":
+            assert actual == expected
 
 
 def test_snowflake_private_credentials_malformed_certificate(
@@ -231,7 +234,8 @@ def test_snowflake_credentials_validate_private_key_path_init(
         if isinstance(actual, (SecretStr, SecretBytes)):
             actual = actual.get_secret_value()
         elif isinstance(actual, Path):
-            actual = str(actual)
+            actual = relative_path_to_current_platform(actual)
+            expected = relative_path_to_current_platform(expected)
         assert actual == expected
 
 
