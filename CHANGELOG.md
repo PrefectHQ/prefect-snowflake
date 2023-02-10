@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Using `private_key_path` in `SnowflakeCredentials` - [#67](https://github.com/PrefectHQ/prefect-snowflake/pull/67)
+
 ### Security
 
 ## 0.26.0
