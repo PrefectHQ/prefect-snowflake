@@ -1,8 +1,8 @@
 # prefect-snowflake
 
 <p align="center">
-    <!--- Insert a cover image here -->
-    <!--- <br> -->
+    <img src="https://user-images.githubusercontent.com/15331990/217983397-036ddfd1-22c4-4113-8045-d5d9e43b963c.png">
+    <br>
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
