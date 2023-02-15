@@ -580,7 +580,7 @@ async def snowflake_query(
     query: str,
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
     poll_frequency_seconds: int = 1,
 ) -> List[Tuple[Any]]:
     """
