@@ -142,5 +142,6 @@ def snowflake_connect_mock(monkeypatch):
     mock_connection = MagicMock(name="connection mock")
     mock_connection.return_value.is_still_running.return_value = False
     mock_connection.return_value.cursor = mock_cursor
+
     monkeypatch.setattr("snowflake.connector.connect", mock_connection)
     return mock_connection
