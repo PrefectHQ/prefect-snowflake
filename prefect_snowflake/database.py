@@ -257,7 +257,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> Tuple[Any]:
         """
@@ -319,7 +319,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         size: Optional[int] = None,
-        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -391,7 +391,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -453,7 +453,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -647,7 +647,7 @@ async def snowflake_multiquery(
     queries: List[str],
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
     as_transaction: bool = False,
     return_transaction_control_results: bool = False,
     poll_frequency_seconds: int = 1,
@@ -732,7 +732,7 @@ async def snowflake_query_sync(
     query: str,
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
 ) -> List[Tuple[Any]]:
     """
     Executes a query in sync mode against a Snowflake database.
