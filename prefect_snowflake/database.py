@@ -163,7 +163,7 @@ class SnowflakeConnector(DatabaseBlock):
     def _get_cursor(
         self,
         inputs: Dict[str, Any],
-        cursor_class: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
     ) -> Tuple[bool, SnowflakeCursor]:
         """
         Get a Snowflake cursor.
@@ -171,7 +171,7 @@ class SnowflakeConnector(DatabaseBlock):
         Args:
             inputs: The inputs to generate a unique hash, used to decide
                 whether a new cursor should be used.
-            cursor_class: The class of the cursor to use when creating a
+            cursor_type: The class of the cursor to use when creating a
                 Snowflake cursor.
 
         Returns:
@@ -187,7 +187,7 @@ class SnowflakeConnector(DatabaseBlock):
                 "please open an issue with a reproducible example."
             )
         if input_hash not in self._unique_cursors.keys():
-            new_cursor = self._connection.cursor(cursor_class=cursor_class)
+            new_cursor = self._connection.cursor(cursor_type)
             self._unique_cursors[input_hash] = new_cursor
             return True, new_cursor
         else:
@@ -257,7 +257,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> Tuple[Any]:
         """
@@ -270,7 +270,7 @@ class SnowflakeConnector(DatabaseBlock):
         Args:
             operation: The SQL query or other operation to be executed.
             parameters: The parameters for the operation.
-            cursor_class: The class of the cursor to use when creating a Snowflake cursor.
+            cursor_type: The class of the cursor to use when creating a Snowflake cursor.
             **execute_kwargs: Additional options to pass to `cursor.execute_async`.
 
         Returns:
@@ -306,7 +306,7 @@ class SnowflakeConnector(DatabaseBlock):
             params=parameters,
             **execute_kwargs,
         )
-        new, cursor = self._get_cursor(inputs, cursor_class=cursor_class)
+        new, cursor = self._get_cursor(inputs, cursor_type=cursor_type)
         if new:
             await self._execute_async(cursor, inputs)
         self.logger.debug("Preparing to fetch a row.")
@@ -319,7 +319,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         size: Optional[int] = None,
-        cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -334,7 +334,7 @@ class SnowflakeConnector(DatabaseBlock):
             parameters: The parameters for the operation.
             size: The number of results to return; if None or 0, uses the value of
                 `fetch_size` configured on the block.
-            cursor_class: The class of the cursor to use when creating a Snowflake cursor.
+            cursor_type: The class of the cursor to use when creating a Snowflake cursor.
             **execute_kwargs: Additional options to pass to `cursor.execute_async`.
 
         Returns:
@@ -378,7 +378,7 @@ class SnowflakeConnector(DatabaseBlock):
             params=parameters,
             **execute_kwargs,
         )
-        new, cursor = self._get_cursor(inputs, cursor_class)
+        new, cursor = self._get_cursor(inputs, cursor_type)
         if new:
             await self._execute_async(cursor, inputs)
         size = size or self.fetch_size
@@ -391,7 +391,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -404,7 +404,7 @@ class SnowflakeConnector(DatabaseBlock):
         Args:
             operation: The SQL query or other operation to be executed.
             parameters: The parameters for the operation.
-            cursor_class: The class of the cursor to use when creating a Snowflake cursor.
+            cursor_type: The class of the cursor to use when creating a Snowflake cursor.
             **execute_kwargs: Additional options to pass to `cursor.execute_async`.
 
         Returns:
@@ -441,7 +441,7 @@ class SnowflakeConnector(DatabaseBlock):
             params=parameters,
             **execute_kwargs,
         )
-        new, cursor = self._get_cursor(inputs, cursor_class)
+        new, cursor = self._get_cursor(inputs, cursor_type)
         if new:
             await self._execute_async(cursor, inputs)
         self.logger.debug("Preparing to fetch all rows.")
@@ -453,7 +453,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+        cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -465,7 +465,7 @@ class SnowflakeConnector(DatabaseBlock):
         Args:
             operation: The SQL query or other operation to be executed.
             parameters: The parameters for the operation.
-            cursor_class: The class of the cursor to use when creating a Snowflake cursor.
+            cursor_type: The class of the cursor to use when creating a Snowflake cursor.
             **execute_kwargs: Additional options to pass to `cursor.execute_async`.
 
         Examples:
@@ -486,7 +486,7 @@ class SnowflakeConnector(DatabaseBlock):
             params=parameters,
             **execute_kwargs,
         )
-        with self._connection.cursor(cursor_class) as cursor:
+        with self._connection.cursor(cursor_type) as cursor:
             await run_sync_in_worker_thread(cursor.execute, **inputs)
         self.logger.info(f"Executed the operation, {operation!r}.")
 
@@ -590,7 +590,7 @@ async def snowflake_query(
         query: The query to execute against the database.
         params: The params to replace the placeholders in the query.
         snowflake_connector: The credentials to use to authenticate.
-        cursor_class: The type of database cursor to use for the query.
+        cursor_type: The type of database cursor to use for the query.
         poll_frequency_seconds: Number of seconds to wait in between checks for
             run completion.
 
@@ -630,7 +630,7 @@ async def snowflake_query(
     """
     # context manager automatically rolls back failed transactions and closes
     with snowflake_connector.get_connection() as connection:
-        with connection.cursor(cursor_class) as cursor:
+        with connection.cursor(cursor_type) as cursor:
             response = cursor.execute_async(query, params=params)
             query_id = response["queryId"]
             while connection.is_still_running(
@@ -647,7 +647,7 @@ async def snowflake_multiquery(
     queries: List[str],
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+    cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
     as_transaction: bool = False,
     return_transaction_control_results: bool = False,
     poll_frequency_seconds: int = 1,
@@ -660,7 +660,7 @@ async def snowflake_multiquery(
         queries: The list of queries to execute against the database.
         params: The params to replace the placeholders in the query.
         snowflake_connector: The credentials to use to authenticate.
-        cursor_class: The type of database cursor to use for the query.
+        cursor_type: The type of database cursor to use for the query.
         as_transaction: If True, queries are executed in a transaction.
         return_transaction_control_results: Determines if the results of queries
             controlling the transaction (BEGIN/COMMIT) should be returned.
@@ -707,7 +707,7 @@ async def snowflake_multiquery(
             queries.insert(0, BEGIN_TRANSACTION_STATEMENT)
             queries.append(END_TRANSACTION_STATEMENT)
 
-        with connection.cursor(cursor_class) as cursor:
+        with connection.cursor(cursor_type) as cursor:
             results = []
             for query in queries:
                 response = cursor.execute_async(query, params=params)
@@ -732,7 +732,7 @@ async def snowflake_query_sync(
     query: str,
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_class: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
+    cursor_type: Optional[type[SnowflakeCursor]] = SnowflakeCursor,
 ) -> List[Tuple[Any]]:
     """
     Executes a query in sync mode against a Snowflake database.
@@ -741,7 +741,7 @@ async def snowflake_query_sync(
         query: The query to execute against the database.
         params: The params to replace the placeholders in the query.
         snowflake_connector: The credentials to use to authenticate.
-        cursor_class: The type of database cursor to use for the query.
+        cursor_type: The type of database cursor to use for the query.
 
     Returns:
         The output of `response.fetchall()`.
@@ -778,7 +778,7 @@ async def snowflake_query_sync(
     """
     # context manager automatically rolls back failed transactions and closes
     with snowflake_connector.get_connection() as connection:
-        with connection.cursor(cursor_class) as cursor:
+        with connection.cursor(cursor_type) as cursor:
             cursor.execute(query, params=params)
             result = cursor.fetchall()
     return result
