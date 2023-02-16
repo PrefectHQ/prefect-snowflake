@@ -1,7 +1,7 @@
 """Module for querying against Snowflake databases."""
 
 import asyncio
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from prefect import task
 from prefect.blocks.abstract import DatabaseBlock
@@ -163,7 +163,7 @@ class SnowflakeConnector(DatabaseBlock):
     def _get_cursor(
         self,
         inputs: Dict[str, Any],
-        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
     ) -> Tuple[bool, SnowflakeCursor]:
         """
         Get a Snowflake cursor.
@@ -257,7 +257,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> Tuple[Any]:
         """
@@ -319,7 +319,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         size: Optional[int] = None,
-        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -391,7 +391,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> List[Tuple[Any]]:
         """
@@ -453,7 +453,7 @@ class SnowflakeConnector(DatabaseBlock):
         self,
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
-        cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+        cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
         **execute_kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -580,7 +580,7 @@ async def snowflake_query(
     query: str,
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+    cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
     poll_frequency_seconds: int = 1,
 ) -> List[Tuple[Any]]:
     """
@@ -647,7 +647,7 @@ async def snowflake_multiquery(
     queries: List[str],
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+    cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
     as_transaction: bool = False,
     return_transaction_control_results: bool = False,
     poll_frequency_seconds: int = 1,
@@ -732,7 +732,7 @@ async def snowflake_query_sync(
     query: str,
     snowflake_connector: SnowflakeConnector,
     params: Union[Tuple[Any], Dict[str, Any]] = None,
-    cursor_type: type[SnowflakeCursor] = SnowflakeCursor,
+    cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
 ) -> List[Tuple[Any]]:
     """
     Executes a query in sync mode against a Snowflake database.
