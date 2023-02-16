@@ -3,6 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from prefect import flow
 from pydantic import SecretBytes, SecretStr
+from snowflake.connector import DictCursor
+from snowflake.connector.cursor import SnowflakeCursor as OriginalSnowflakeCursorClass
 
 from prefect_snowflake.database import (
     BEGIN_TRANSACTION_STATEMENT,
@@ -216,6 +218,38 @@ class TestSnowflakeConnector:
         assert result == (0,)
         result = snowflake_connector.fetch_one("query", parameters=("param",))
         assert result == (1,)
+
+    def test_fetch_one_cursor_set_to_dict_cursor(
+        self, snowflake_connector: SnowflakeConnector
+    ):
+        _ = snowflake_connector.fetch_one(
+            "query", parameters=("param",), cursor_type=DictCursor
+        )
+        args, _ = snowflake_connector._connection.cursor.call_args
+
+        assert args[0] == DictCursor
+
+    def test_fetch_one_cursor_default(self, snowflake_connector: SnowflakeConnector):
+        _ = snowflake_connector.fetch_one("query", parameters=("param",))
+        args, kwargs = snowflake_connector._connection.cursor.call_args
+
+        assert args[0] == OriginalSnowflakeCursorClass
+
+    def test_fetch_all_cursor_set_to_dict_cursor(
+        self, snowflake_connector: SnowflakeConnector
+    ):
+        _ = snowflake_connector.fetch_all(
+            "query", parameters=("param",), cursor_type=DictCursor
+        )
+        args, _ = snowflake_connector._connection.cursor.call_args
+
+        assert args[0] == DictCursor
+
+    def test_fetch_all_cursor_default(self, snowflake_connector: SnowflakeConnector):
+        _ = snowflake_connector.fetch_all("query", parameters=("param",))
+        args, _ = snowflake_connector._connection.cursor.call_args
+
+        assert args[0] == OriginalSnowflakeCursorClass
 
     def test_fetch_many(self, snowflake_connector: SnowflakeConnector):
         result = snowflake_connector.fetch_many("query", parameters=("param",), size=2)
