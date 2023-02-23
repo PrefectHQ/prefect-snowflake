@@ -7,7 +7,7 @@
         <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
         <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
-    <a href="https://pepy.tech/badge/prefect-snowflake/" alt="Downloads">
+    <a href="https://pypistats.org/packages/prefect-snowflake/" alt="Downloads">
         <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/pulse" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
@@ -161,7 +161,7 @@ def snowflake_write_pandas_flow():
 
 ## Resources
 
-For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://orion-docs.prefect.io/collections/usage/)!
+For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://docs.prefect.io/collections/usage/)!
 
 ### Installation
 
@@ -233,7 +233,7 @@ SnowflakeConnector.load("CONNECTOR-BLOCK-NAME-PLACEHOLDER")
 !!! info "Registering blocks"
 
     Register blocks in this module to
-    [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
+    [view and edit them](https://docs.prefect.io/ui/blocks/)
     on Prefect Cloud:
 
     ```bash
