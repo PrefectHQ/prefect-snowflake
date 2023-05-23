@@ -4,6 +4,7 @@ import re
 import warnings
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
+from typing_extensions import Literal
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import (
@@ -12,11 +13,6 @@ from cryptography.hazmat.primitives.serialization import (
     PrivateFormat,
     load_pem_private_key,
 )
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 import snowflake.connector
 from prefect.blocks.abstract import CredentialsBlock
