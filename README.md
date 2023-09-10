@@ -40,91 +40,91 @@ Be sure to install [prefect-snowflake](#installation) and [save to block](#savin
 
 === "Sync"
 
-    ```python
-    from prefect import flow, task
-    from prefect_snowflake import SnowflakeConnector
+```python
+from prefect import flow, task
+from prefect_snowflake import SnowflakeConnector
 
 
-    @task
-    def setup_table(block_name: str) -> None:
-        with SnowflakeConnector.load(block_name) as connector:
-            connector.execute(
-                "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
-            )
-            connector.execute_many(
-                "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
-                seq_of_parameters=[
-                    {"name": "Ford", "address": "Highway 42"},
-                    {"name": "Unknown", "address": "Space"},
-                    {"name": "Me", "address": "Myway 88"},
-                ],
-            )
+@task
+def setup_table(block_name: str) -> None:
+    with SnowflakeConnector.load(block_name) as connector:
+        connector.execute(
+            "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+        )
+        connector.execute_many(
+            "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+            seq_of_parameters=[
+                {"name": "Ford", "address": "Highway 42"},
+                {"name": "Unknown", "address": "Space"},
+                {"name": "Me", "address": "Myway 88"},
+            ],
+        )
 
-    @task
-    def fetch_data(block_name: str) -> list:
-        all_rows = []
-        with SnowflakeConnector.load(block_name) as connector:
-            while True:
-                # Repeated fetch* calls using the same operation will
-                # skip re-executing and instead return the next set of results
-                new_rows = connector.fetch_many("SELECT * FROM customers", size=2)
-                if len(new_rows) == 0:
-                    break
-                all_rows.append(new_rows)
-        return all_rows
+@task
+def fetch_data(block_name: str) -> list:
+    all_rows = []
+    with SnowflakeConnector.load(block_name) as connector:
+        while True:
+            # Repeated fetch* calls using the same operation will
+            # skip re-executing and instead return the next set of results
+            new_rows = connector.fetch_many("SELECT * FROM customers", size=2)
+            if len(new_rows) == 0:
+                break
+            all_rows.append(new_rows)
+    return all_rows
 
-    @flow
-    def snowflake_flow(block_name: str) -> list:
-        setup_table(block_name)
-        all_rows = fetch_data(block_name)
-        return all_rows
+@flow
+def snowflake_flow(block_name: str) -> list:
+    setup_table(block_name)
+    all_rows = fetch_data(block_name)
+    return all_rows
 
-    snowflake_flow()
-    ```
+snowflake_flow()
+```
 
 === "Async"
 
-    ```python
-    from prefect import flow, task
-    from prefect_snowflake import SnowflakeConnector
-    import asyncio
+```python
+from prefect import flow, task
+from prefect_snowflake import SnowflakeConnector
+import asyncio
 
-    @task
-    async def setup_table(block_name: str) -> None:
-        with await SnowflakeConnector.load(block_name) as connector:
-            await connector.execute(
-                "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
-            )
-            await connector.execute_many(
-                "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
-                seq_of_parameters=[
-                    {"name": "Ford", "address": "Highway 42"},
-                    {"name": "Unknown", "address": "Space"},
-                    {"name": "Me", "address": "Myway 88"},
-                ],
-            )
+@task
+async def setup_table(block_name: str) -> None:
+    with await SnowflakeConnector.load(block_name) as connector:
+        await connector.execute(
+            "CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);"
+        )
+        await connector.execute_many(
+            "INSERT INTO customers (name, address) VALUES (%(name)s, %(address)s);",
+            seq_of_parameters=[
+                {"name": "Ford", "address": "Highway 42"},
+                {"name": "Unknown", "address": "Space"},
+                {"name": "Me", "address": "Myway 88"},
+            ],
+        )
 
-    @task
-    async def fetch_data(block_name: str) -> list:
-        all_rows = []
-        with await SnowflakeConnector.load(block_name) as connector:
-            while True:
-                # Repeated fetch* calls using the same operation will
-                # skip re-executing and instead return the next set of results
-                new_rows = await connector.fetch_many("SELECT * FROM customers", size=2)
-                if len(new_rows) == 0:
-                    break
-                all_rows.append(new_rows)
-        return all_rows
+@task
+async def fetch_data(block_name: str) -> list:
+    all_rows = []
+    with await SnowflakeConnector.load(block_name) as connector:
+        while True:
+            # Repeated fetch* calls using the same operation will
+            # skip re-executing and instead return the next set of results
+            new_rows = await connector.fetch_many("SELECT * FROM customers", size=2)
+            if len(new_rows) == 0:
+                break
+            all_rows.append(new_rows)
+    return all_rows
 
-    @flow
-    async def snowflake_flow(block_name: str) -> list:
-        await setup_table(block_name)
-        all_rows = await fetch_data(block_name)
-        return all_rows
+@flow
+async def snowflake_flow(block_name: str) -> list:
+    await setup_table(block_name)
+    all_rows = await fetch_data(block_name)
+    return all_rows
 
-    asyncio.run(snowflake_flow("example"))
-    ```
+asyncio.run(snowflake_flow("example"))
+```
 
 ### Access underlying Snowflake connection
 
@@ -232,13 +232,13 @@ SnowflakeConnector.load("CONNECTOR-BLOCK-NAME-PLACEHOLDER")
 
 !!! info "Registering blocks"
 
-    Register blocks in this module to
-    [view and edit them](https://orion-docs.prefect.io/ui/blocks/)
-    on Prefect Cloud:
+Register blocks in this module to
+[view and edit them](https://orion-docs.prefect.io/ui/blocks/)
+on Prefect Cloud:
 
-    ```bash
-    prefect block register -m prefect_snowflake
-    ```
+```bash
+prefect block register -m prefect_snowflake
+```
 
 A list of available blocks in `prefect-snowflake` and their setup instructions can be found [here](https://PrefectHQ.github.io/prefect-snowflake/blocks_catalog).
 
