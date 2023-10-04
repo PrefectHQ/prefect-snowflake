@@ -5,7 +5,12 @@ from unittest.mock import MagicMock
 import pytest
 from prefect import flow
 from prefect.utilities.filesystem import relative_path_to_current_platform
-from pydantic import SecretBytes, SecretStr
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import SecretBytes, SecretStr
+else:
+    from pydantic import SecretBytes, SecretStr
 
 from prefect_snowflake.credentials import InvalidPemFormat, SnowflakeCredentials
 from prefect_snowflake.database import SnowflakeConnector
