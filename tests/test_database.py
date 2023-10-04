@@ -2,7 +2,13 @@ from unittest.mock import MagicMock
 
 import pytest
 from prefect import flow
-from pydantic import SecretBytes, SecretStr
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import SecretBytes, SecretStr
+else:
+    from pydantic import SecretBytes, SecretStr
+
 from snowflake.connector import DictCursor
 from snowflake.connector.cursor import SnowflakeCursor as OriginalSnowflakeCursorClass
 
