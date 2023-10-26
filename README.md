@@ -145,7 +145,7 @@ def snowflake_write_pandas_flow():
         table_name = "TABLE_NAME"
         ddl = "NAME STRING, NUMBER INT"
         statement = f'CREATE TABLE IF NOT EXISTS {table_name} ({ddl})'
-        with connector.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(statement)
 
         # case sensitivity matters here!
