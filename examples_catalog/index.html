@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.14">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.fad675c6.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
@@ -273,6 +273,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
         
@@ -289,6 +290,7 @@
     
       
       
+  
   
   
   
@@ -311,6 +313,7 @@
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -359,14 +362,18 @@
       
         <li class="md-nav__item">
   <a href="#credentials-module" class="md-nav__link">
-    Credentials Module
+    <span class="md-ellipsis">
+      Credentials Module
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#database-module" class="md-nav__link">
-    Database Module
+    <span class="md-ellipsis">
+      Database Module
+    </span>
   </a>
   
 </li>
@@ -381,6 +388,7 @@
     
       
       
+  
   
   
   
@@ -420,6 +428,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../credentials/" class="md-nav__link">
         
@@ -437,6 +446,7 @@
             
               
                 
+  
   
   
   
@@ -490,14 +500,18 @@
       
         <li class="md-nav__item">
   <a href="#credentials-module" class="md-nav__link">
-    Credentials Module
+    <span class="md-ellipsis">
+      Credentials Module
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#database-module" class="md-nav__link">
-    Database Module
+    <span class="md-ellipsis">
+      Database Module
+    </span>
   </a>
   
 </li>
@@ -554,7 +568,12 @@
     <span class="n">conn</span><span class="o">.</span><span class="n">reset_cursors</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM customers&quot;</span><span class="p">))</span>  <span class="c1"># should be Ford again</span>
 </code></pre></div>
-Create table and insert three rows into it.
+Load stored Snowflake connector as a context manager:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">):</span>
+</code></pre></div></p>
+<p>Insert data into database and fetch results.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 
 <span class="k">with</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -564,11 +583,16 @@ Create table and insert three rows into it.
     <span class="n">conn</span><span class="o">.</span><span class="n">execute_many</span><span class="p">(</span>
         <span class="s2">&quot;INSERT INTO customers (name, address) VALUES (</span><span class="si">%(name)s</span><span class="s2">, </span><span class="si">%(address)s</span><span class="s2">);&quot;</span><span class="p">,</span>
         <span class="n">seq_of_parameters</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Marvin&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ford&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Me&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Myway 88&quot;</span><span class="p">},</span>
         <span class="p">],</span>
     <span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span>
+        <span class="s2">&quot;SELECT * FROM customers WHERE address = </span><span class="si">%(address)s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 </code></pre></div>
 Repeatedly fetch two rows from the database where address is Highway 42.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
@@ -598,49 +622,6 @@ Repeatedly fetch two rows from the database where address is Highway 42.
         <span class="n">size</span><span class="o">=</span><span class="mi">2</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># Unknown, Me</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
-<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="n">snowflake_credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="p">(</span>
-    <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account&quot;</span><span class="p">,</span>
-    <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
-    <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
-    <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
-    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span>
-    <span class="n">credentials</span><span class="o">=</span><span class="n">snowflake_credentials</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">snowflake_connector</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
-    <span class="o">...</span>
-</code></pre></div>
-Load stored Snowflake connector as a context manager:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">):</span>
-</code></pre></div></p>
-<p>Insert data into database and fetch results.
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
-
-<span class="k">with</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-        <span class="s2">&quot;CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);&quot;</span>
-    <span class="p">)</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">execute_many</span><span class="p">(</span>
-        <span class="s2">&quot;INSERT INTO customers (name, address) VALUES (</span><span class="si">%(name)s</span><span class="s2">, </span><span class="si">%(address)s</span><span class="s2">);&quot;</span><span class="p">,</span>
-        <span class="n">seq_of_parameters</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ford&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
-            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">},</span>
-            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Me&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Myway 88&quot;</span><span class="p">},</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span>
-        <span class="s2">&quot;SELECT * FROM customers WHERE address = </span><span class="si">%(address)s</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 </code></pre></div>
 Fetch one row from the database where address is Space.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
@@ -685,6 +666,22 @@ Fetch all rows from the database where address is Highway 42.
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># Marvin, Ford, Unknown</span>
 </code></pre></div>
+Create table and insert three rows into it.
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="k">with</span> <span class="n">SnowflakeConnector</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">&quot;CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);&quot;</span>
+    <span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute_many</span><span class="p">(</span>
+        <span class="s2">&quot;INSERT INTO customers (name, address) VALUES (</span><span class="si">%(name)s</span><span class="s2">, </span><span class="si">%(address)s</span><span class="s2">);&quot;</span><span class="p">,</span>
+        <span class="n">seq_of_parameters</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Marvin&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ford&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Highway 42&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Space&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</code></pre></div>
 Create table named customers with two columns, name and address.
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
 
@@ -692,6 +689,23 @@ Create table named customers with two columns, name and address.
     <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
         <span class="s2">&quot;CREATE TABLE IF NOT EXISTS customers (name varchar, address varchar);&quot;</span>
     <span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect_snowflake.credentials</span> <span class="kn">import</span> <span class="n">SnowflakeCredentials</span>
+<span class="kn">from</span> <span class="nn">prefect_snowflake.database</span> <span class="kn">import</span> <span class="n">SnowflakeConnector</span>
+
+<span class="n">snowflake_credentials</span> <span class="o">=</span> <span class="n">SnowflakeCredentials</span><span class="p">(</span>
+    <span class="n">account</span><span class="o">=</span><span class="s2">&quot;account&quot;</span><span class="p">,</span>
+    <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">snowflake_connector</span> <span class="o">=</span> <span class="n">SnowflakeConnector</span><span class="p">(</span>
+    <span class="n">database</span><span class="o">=</span><span class="s2">&quot;database&quot;</span><span class="p">,</span>
+    <span class="n">warehouse</span><span class="o">=</span><span class="s2">&quot;warehouse&quot;</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span>
+    <span class="n">credentials</span><span class="o">=</span><span class="n">snowflake_credentials</span>
+<span class="p">)</span>
+<span class="k">with</span> <span class="n">snowflake_connector</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+    <span class="o">...</span>
 </code></pre></div></p>
 
 
@@ -839,7 +853,7 @@ Create table named customers with two columns, name and address.
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      <script src="../assets/javascripts/bundle.cd18aaf1.min.js"></script>
       
     
   </body>
