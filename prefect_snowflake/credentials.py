@@ -320,10 +320,10 @@ class SnowflakeCredentials(CredentialsBlock):
             ```
         """  # noqa
         connect_params = {
-            **connect_kwargs,
             # required to track task's usage in the Snowflake Partner Network Portal
             "application": "Prefect_Snowflake_Collection",
             **self.dict(exclude_unset=True, exclude={"block_type_slug"}),
+            **connect_kwargs,
         }
 
         for key, value in connect_params.items():
