@@ -398,3 +398,12 @@ def test_snowflake_with_private_key_path_flow():
         == "passphrase"
     )
     assert snowflake_connector.credentials.password is None
+
+
+def test_snowflake_connect_params(credentials_params, snowflake_connect_mock):
+    snowflake_credentials = SnowflakeCredentials(**credentials_params)
+
+    # The returned client is mocked, use the fixture instead
+    _ = snowflake_credentials.get_client(autocommit=False)
+
+    assert snowflake_connect_mock.call_args_list[0][1]["autocommit"] is False

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Ability to specify what kind of cursor is used in a query - [#71](https://github.com/PrefectHQ/prefect-snowflake/pull/71)
+- User-provided connect kwargs have precedence over the default - [#97] (https://github.com/PrefectHQ/prefect-snowflake/pull/97)
 ### Changed
 
 ### Deprecated
