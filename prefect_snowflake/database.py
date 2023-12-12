@@ -113,7 +113,7 @@ class SnowflakeConnector(DatabaseBlock):
     _connection: Optional[SnowflakeConnection] = None
     _unique_cursors: Dict[str, SnowflakeCursor] = None
 
-    def get_connection(self, **connect_kwargs: Dict[str, Any]) -> SnowflakeConnection:
+    def get_connection(self, **connect_kwargs: Any) -> SnowflakeConnection:
         """
         Returns an authenticated connection that can be
         used to query from Snowflake databases.
@@ -264,7 +264,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
-        **execute_kwargs: Dict[str, Any],
+        **execute_kwargs: Any,
     ) -> Tuple[Any]:
         """
         Fetch a single result from the database.
@@ -326,7 +326,7 @@ class SnowflakeConnector(DatabaseBlock):
         parameters: Optional[Dict[str, Any]] = None,
         size: Optional[int] = None,
         cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
-        **execute_kwargs: Dict[str, Any],
+        **execute_kwargs: Any,
     ) -> List[Tuple[Any]]:
         """
         Fetch a limited number of results from the database.
@@ -398,7 +398,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
-        **execute_kwargs: Dict[str, Any],
+        **execute_kwargs: Any,
     ) -> List[Tuple[Any]]:
         """
         Fetch all results from the database.
@@ -460,7 +460,7 @@ class SnowflakeConnector(DatabaseBlock):
         operation: str,
         parameters: Optional[Dict[str, Any]] = None,
         cursor_type: Type[SnowflakeCursor] = SnowflakeCursor,
-        **execute_kwargs: Dict[str, Any],
+        **execute_kwargs: Any,
     ) -> None:
         """
         Executes an operation on the database. This method is intended to be used
