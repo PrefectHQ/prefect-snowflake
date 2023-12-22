@@ -112,6 +112,7 @@ def private_key_no_pass_credentials_params():
         "private_key": _read_test_file("test_cert_no_pass.p8"),
     }
 
+
 @pytest.fixture()
 def private_no_pass_connector_params(private_no_pass_credentials_params):
 
