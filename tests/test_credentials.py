@@ -219,13 +219,21 @@ def test_snowflake_credentials_validate_private_key_is_pem(
         assert credentials.resolve_private_key() is not None
 
 
-def test_snowflake_credentials_validate_private_key_is_pem_bytes(
+def test_snowflake_credentials_validate_invalid_private_key_is_not_pem_bytes(
     private_no_pass_credentials_params,
 ):
     private_no_pass_credentials_params["private_key"] = "_invalid_key_"
     with pytest.raises(InvalidPemFormat):
         credentials = SnowflakeCredentials(**private_no_pass_credentials_params)
         assert credentials.resolve_private_key() is not None
+
+
+def test_snowflake_credentials_validate_private_key_is_pem_bytes(
+    private_key_no_pass_credentials_params,
+):
+    credentials = SnowflakeCredentials(**private_key_no_pass_credentials_params)
+    resolved_key = credentials.resolve_private_key()
+    assert resolved_key is not None
 
 
 def test_snowflake_credentials_validate_private_key_path_init(

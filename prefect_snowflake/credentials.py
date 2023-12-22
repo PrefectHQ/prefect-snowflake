@@ -85,7 +85,7 @@ class SnowflakeCredentials(CredentialsBlock):
     password: Optional[SecretStr] = Field(
         default=None, description="The password used to authenticate."
     )
-    private_key: Optional[SecretBytes] = Field(
+    private_key: Optional[SecretStr] = Field(
         default=None, description="The PEM used to authenticate."
     )
     private_key_path: Optional[Path] = Field(
