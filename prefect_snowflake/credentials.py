@@ -3,7 +3,7 @@
 import re
 import warnings
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import (
@@ -283,7 +283,7 @@ class SnowflakeCredentials(CredentialsBlock):
         return f"{pem_parts[1]}\n{body}\n{pem_parts[3]}".encode()
 
     def get_client(
-        self, **connect_kwargs: Dict[str, Any]
+        self, **connect_kwargs: Any
     ) -> snowflake.connector.SnowflakeConnection:
         """
         Returns an authenticated connection that can be used to query
