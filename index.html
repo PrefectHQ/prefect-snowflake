@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.6">
     
     
       
@@ -104,7 +104,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="prefect-snowflake" class="md-header__button md-logo" aria-label="prefect-snowflake" data-md-component="logo">
       
-  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
+  <img src="img/prefect-logo-mark.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -246,7 +246,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="prefect-snowflake" class="md-nav__button md-logo" aria-label="prefect-snowflake" data-md-component="logo">
       
-  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
+  <img src="img/prefect-logo-mark.png" alt="logo">
 
     </a>
     prefect-snowflake
@@ -684,21 +684,17 @@
 
 <h1 id="prefect-snowflake">prefect-snowflake</h1>
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/15331990/217983397-036ddfd1-22c4-4113-8045-d5d9e43b963c.png">
-    <br>
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=26272B&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
-        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <a href="https://pepy.tech/badge/prefect-snowflake/" alt="Downloads">
-        <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <br>
     <a href="https://prefect-community.slack.com" alt="Slack">
-        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
-    <a href="https://discourse.prefect.io/" alt="Discourse">
-        <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
+        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelcolor=26272B&labelColor=090422&logo=slack" /></a>
 </p>
 
 <h2 id="welcome">Welcome!</h2>
@@ -829,17 +825,17 @@
         <span class="p">)</span>
 </code></pre></div>
 <h2 id="resources">Resources</h2>
-<p>For more tips on how to use tasks and flows in a Collection, check out <a href="https://orion-docs.prefect.io/collections/usage/">Using Collections</a>!</p>
+<p>For more tips on how to use tasks and flows in an integration, check out <a href="https://docs.prefect.io/integrations/usage/">Using Collections</a>!</p>
 <h3 id="installation">Installation</h3>
 <p>Install <code>prefect-snowflake</code> with <code>pip</code>:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>prefect-snowflake
 </code></pre></div>
 <p>A list of available blocks in <code>prefect-snowflake</code> and their setup instructions can be found <a href="https://PrefectHQ.github.io/prefect-snowflake/blocks_catalog">here</a>.</p>
-<p>Requires an installation of Python 3.7+.</p>
+<p>Requires an installation of Python 3.8+.</p>
 <p>We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.</p>
-<p>These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
+<p>These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the <a href="https://docs.prefect.io/">Prefect documentation</a>.</p>
 <h3 id="saving-credentials-to-block">Saving credentials to block</h3>
-<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or saved through the UI.</p>
 <p>Below is a walkthrough on saving a <code>SnowflakeCredentials</code> block through code.</p>
 <ol>
 <li>Head over to https://app.snowflake.com/.</li>
@@ -884,7 +880,7 @@
 <p class="admonition-title">Registering blocks</p>
 </div>
 <p>Register blocks in this module to
-<a href="https://orion-docs.prefect.io/ui/blocks/">view and edit them</a>
+<a href="https://docs.prefect.io/ui/blocks/">view and edit them</a>
 on Prefect Cloud:</p>
 <div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_snowflake
 </code></pre></div>
@@ -1061,10 +1057,10 @@ on Prefect Cloud:</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.c011b7c0.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.7389ff0e.min.js"></script>
+      <script src="assets/javascripts/bundle.e1c3ead8.min.js"></script>
       
     
   </body>
