@@ -1,21 +1,17 @@
 # prefect-snowflake
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/15331990/217983397-036ddfd1-22c4-4113-8045-d5d9e43b963c.png">
-    <br>
     <a href="https://pypi.python.org/pypi/prefect-snowflake/" alt="PyPI version">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=0052FF&labelColor=090422"></a>
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-snowflake?color=26272B&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/" alt="Stars">
-        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <a href="https://pepy.tech/badge/prefect-snowflake/" alt="Downloads">
-        <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/pypi/dm/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <a href="https://github.com/PrefectHQ/prefect-snowflake/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-snowflake?color=26272B&labelColor=090422" /></a>
     <br>
     <a href="https://prefect-community.slack.com" alt="Slack">
-        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
-    <a href="https://discourse.prefect.io/" alt="Discourse">
-        <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
+        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelcolor=26272B&labelColor=090422&logo=slack" /></a>
 </p>
 
 Visit the full docs [here](https://PrefectHQ.github.io/prefect-snowflake) to see additional examples and the API reference.
@@ -161,7 +157,7 @@ def snowflake_write_pandas_flow():
 
 ## Resources
 
-For more tips on how to use tasks and flows in a Collection, check out [Using Collections](https://orion-docs.prefect.io/collections/usage/)!
+For more tips on how to use tasks and flows in an integration, check out [Using Collections](https://docs.prefect.io/integrations/usage/)!
 
 ### Installation
 
@@ -173,15 +169,15 @@ pip install prefect-snowflake
 
 A list of available blocks in `prefect-snowflake` and their setup instructions can be found [here](https://PrefectHQ.github.io/prefect-snowflake/blocks_catalog).
 
-Requires an installation of Python 3.7+.
+Requires an installation of Python 3.8+.
 
 We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.
 
-These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the [Prefect documentation](https://orion-docs.prefect.io/).
+These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the [Prefect documentation](https://docs.prefect.io/).
 
 ### Saving credentials to block
 
-Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
+Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://docs.prefect.io/concepts/blocks/#saving-blocks) or saved through the UI.
 
 Below is a walkthrough on saving a `SnowflakeCredentials` block through code.
 
@@ -233,7 +229,7 @@ SnowflakeConnector.load("CONNECTOR-BLOCK-NAME-PLACEHOLDER")
 !!! info "Registering blocks"
 
 Register blocks in this module to
-[view and edit them](https://orion-docs.prefect.io/ui/blocks/)
+[view and edit them](https://docs.prefect.io/ui/blocks/)
 on Prefect Cloud:
 
 ```bash
