@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type hints for **kwargs are now parsed correctly - [#98] (https://github.com/PrefectHQ/prefect-snowflake/pull/98)
 ### Changed
 
+- Update branding and links
+
 ### Deprecated
 
 ### Removed
